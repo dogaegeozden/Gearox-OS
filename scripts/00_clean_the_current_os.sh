@@ -6,7 +6,6 @@ declare_variables() {
 
 	# Executing the "which" system command to find the location of the apt-cache command.
 	check_installation_command=`which apt-cache`
-
 	# Creating a list of unwanted softwares.
 	unnecessary_apps=("gnome-2048" "aisleriot" "remmina" "anthy-common" "thunderbird" "fcitx" "fcitx5" "five-or-more" "four-in-a-row" "goldendict" "hitori" "gnome-nibbles" "gnome-klotski" "gnome-mines" "gnome-klotski" "gnome-mahjongg" "lightsoff" "gnome-maps" "quadrapassel" "swell-foop" "tali" "gnome-taquin" "hdate-applet" "gnome-tetravex" "xterm" "gnome-sound-recorder" "xiterm+thai" "gnome-robots" "mlterm-common" "iagno" "malcontent" "gnome-music" "gnome-terminal")
 }
@@ -18,7 +17,6 @@ main() {
 	declare_variables
 	# Calling the unWantedSR function
 	remove_unwanted_softwares
-
 	# Clearing the local repository of retrieved files. It's good to run time to time to free up disk space.
 	sudo apt-get clean
 	# Clearing the local repository of retrieved files which are can no longer downloaded and largely useless. It's good to run time to time to free up disk space.
