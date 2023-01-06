@@ -42,7 +42,7 @@ make_executable() {
 }
 
 execute_the_scripts() {
-    # A function which executes the scripts.
+    # A function which executes the scripts
 
     # Changing the current working directory to the scripts folder.
     cd $scripts_folder
