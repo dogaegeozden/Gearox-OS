@@ -16,7 +16,7 @@ declaring_variables() {
 main() {
     # The function which runs the entire script.
 
-    if [[ `echo $XDG_CURRENT_DESKTOP == *"GNOME"*`]]; then
+    if [[ `echo $XDG_CURRENT_DESKTOP` == *"GNOME"*]]; then
         # Calling the declaring_variables function.
         declaring_variables
         # Calling the add_minimize_and_maximize_buttons function.
