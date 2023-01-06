@@ -5,10 +5,10 @@
 declare_variables() {
     # A function which creates variables
     # Getting the user name
-    userName=${SUDO_USER:-${USER}}
+    username=${SUDO_USER:-${USER}}
 
     # Creating a path to the scripts folder.
-    tSFolder=`pwd`"/scripts"
+    scripts_folder=`pwd`"/scripts"
 }
 
 main () {
@@ -23,32 +23,32 @@ main () {
 
 fix_lines() {
     # Looping through file in electro linux's scripts folder and, trantSFileorming the file's lines as the lines without ^M in their ends anymore.
-    for shf in `/usr/bin/ls $tSFolder`; do
-        sudo sed -i -e 's/\r$//' $tSFolder"/$shf"
+    for script in `/usr/bin/ls $scripts_folder`; do
+        sudo sed -i -e 's/\r$//' $scripts_folder"/$script"
     done
 }
 
 make_executable() {
     # Making every single script file in electro linux's scripts folder executable.
-    for s in `/usr/bin/ls $tSFolder`; do
-        sudo chmod u+x $tSFolder"/$s"
+    for script in `/usr/bin/ls $scripts_folder`; do
+        sudo chmod u+x $scripts_folder"/$script"
     done
 }
 
 execute_the_scripts() {
     # Changing the current working directory to the scripts folder.
-    cd $tSFolder
+    cd $scripts_folder
 
     # Looping through each file in the scripts folder.
-    for tSFile in `/usr/bin/ls $tSFolder`; do
+    for script in `/usr/bin/ls $scripts_folder`; do
         # Checking if the file name is not "115_non_su_settings.sh" or "108_installing_yed.sh"
-        if [[ $tSFile != "115_non_su_settings.sh" ]] || [[ $tSFile != "108_installing_yed.sh" ]]; then
+        if [[ $script != "115_non_su_settings.sh" ]] || [[ $script != "108_installing_yed.sh" ]]; then
             # Executing the file as the super user.
-            sudo ./$tSFile
+            sudo ./$script
         # Checking if the file name is "115_non_su_settings.sh" or "108_installing_yed.sh"
         else
             # Executing the file as the reqular user.
-            ./$tSFile
+            ./$script
         fi
     done
 
