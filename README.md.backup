@@ -14,11 +14,11 @@ Electro linux is a custom Ubuntu based operating system which I'm trying to deve
 ## BENEFITS
 1) Tilix terminal emulator is the default terminal emulator instead of gnome terminal emulator. Which is much more convenient.
 
-![TilixImg](https://raw.githubusercontent.com/dogaegeozden/electro_linux_setup_scripts/master/github_images/tilix.png)
+![TilixImg](https://raw.githubusercontent.com/dogaegeozden/electro_linux_setup_scripts/main/github_images/tilix.png)
 
 2) Thunar file manager is the default file manager which is much more user friendly and easy to use because, it allows users to create files and folders from the GUI.
 
-![ThunarFileManagerImg](https://raw.githubusercontent.com/dogaegeozden/electro_linux_setup_scripts/master/github_images/thunar_file_manager.png)
+![ThunarFileManagerImg](https://raw.githubusercontent.com/dogaegeozden/electro_linux_setup_scripts/main/github_images/thunar_file_manager.png)
 
 3) All best note taking and productivity softwares are installing automatically.
 
