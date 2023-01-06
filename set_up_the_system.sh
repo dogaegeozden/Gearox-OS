@@ -53,3 +53,6 @@ execute_the_scripts() {
     done
 
 }
+
+# Calling the main function
+main
