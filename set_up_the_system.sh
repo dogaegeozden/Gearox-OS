@@ -4,6 +4,7 @@
 
 declare_variables() {
     # A function which creates variables
+
     # Getting the user name
     username=${SUDO_USER:-${USER}}
 
@@ -13,6 +14,7 @@ declare_variables() {
 
 main () {
     # The function which runs the entire script
+
     # Calling the declare_variables function
     declare_variables
     # Calling the fix_lines function
@@ -22,6 +24,8 @@ main () {
 }
 
 fix_lines() {
+    # A function which fixes lines
+
     # Looping through file in electro linux's scripts folder and, trantSFileorming the file's lines as the lines without ^M in their ends anymore.
     for script in `/usr/bin/ls $scripts_folder`; do
         sudo sed -i -e 's/\r$//' $scripts_folder"/$script"
@@ -29,6 +33,8 @@ fix_lines() {
 }
 
 make_executable() {
+    # A function which changes file permissions 
+
     # Making every single script file in electro linux's scripts folder executable.
     for script in `/usr/bin/ls $scripts_folder`; do
         sudo chmod u+x $scripts_folder"/$script"
@@ -36,6 +42,8 @@ make_executable() {
 }
 
 execute_the_scripts() {
+    # A function which executes the scripts.
+
     # Changing the current working directory to the scripts folder.
     cd $scripts_folder
 
