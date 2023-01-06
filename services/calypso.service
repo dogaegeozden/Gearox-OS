@@ -1,0 +1,6 @@
+[unit]
+Description=Calypso AI
+[Service]
+ExecStart=/usr/bin/calypso
+[Install]
+WantedBy=multi-user.target

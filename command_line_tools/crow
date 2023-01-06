@@ -1,0 +1,741 @@
+#!/usr/bin/python3
+
+# LIBRARIES
+from os import system, path, makedirs, listdir, popen
+from sys import argv, exit
+from datetime import datetime
+from shutil import rmtree
+from pathlib import Path
+from logging import basicConfig, DEBUG, debug, disable, CRITICAL
+
+# Doing the basic configuration for the debugging feature
+basicConfig(level=DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Comment out the line to enable debugging.
+disable(CRITICAL)
+
+# VARIABLES
+# Cyber kill chain findings folder.
+ckcPath = f'/root/.cyber_kill_chain'
+# Name of the campaign
+campaignN = f'reconnaissance'
+# List of the reconnaissance findings folders
+ckcFolders = ["ping_docs", "nmap_docs", "netcat_docs", "banner_grabbing_docs", "gobuster_docs", "sec_lists"]
+# Creating the path to the folder where ping results are located
+pingDocsFolder = Path(ckcPath,campaignN,ckcFolders[0])
+# Creating the path to the folder where nmap results are located
+nmapDocsFolder = Path(ckcPath,campaignN,ckcFolders[1])
+# Creating the path to the folder where netcat results are located
+ncDocsFolder = Path(ckcPath,campaignN,ckcFolders[2])
+# Creating the path to the folder where banner graping results are located
+gbDocsFolder = Path(ckcPath,campaignN,ckcFolders[3])
+# Creating the path to the folder where gobuster results are located
+gobstrDocsFolder = Path(ckcPath,campaignN,ckcFolders[4])
+# Url to SecLists -> SecLists is the security tester's companion. It's a collection of multiple types of lists used during security assessments, collected in one place. List types include usernames, passwords, URLs, sensitive data patterns, fuzzing payloads, web shells, and many more.
+secListsURL = f'https://github.com/danielmiessler/SecLists'
+# Creating a path to store collection of multiple type of cyber security lists.
+secListsFolder = Path(ckcPath,ckcFolders[5])
+# List of help feature's options
+helpOptions = ["--help", "-help", "-h", "-?"]
+# List of ping sending feature's arguments
+pingOptions = ["-ping", "--ping"]
+# List of port scanning feature's arguments
+nmapOptions = ["-nmap", "--nmap"]
+# List of netcat tool using feature's arguments
+ncOptions = ["-netc", "--netc"]
+# List of connecting from tor feature's arguments
+torOptions = ["-torc", "--torc"]
+# List of banner graping feature's arguments
+gbOptions = ["-grabb", "--grabb"]
+# List of web enumeration feature's arguments
+goBusterOptions = ['-gobtr', '--gobtr']
+# List of rush feature's arguments
+rushOptions = ["-r", "--rush"]
+# List of security list installing feature's arguments
+secListsInstallerOpts = ['--install-seclists', '--remove-seclists']
+# Creating a path object which leads to proxychain software's configuration file
+proxychainsConfFP = Path("/etc/proxychains.conf")
+# Creating an empty list of the required softwares that are not installed and therefore that are not available in the system.
+notInstalledRPackages = []
+# Creating an empty list of the darknet softwares that are not installed and therefore that are not available in the system.
+notInstalledDPackages = []
+# Creating a help page string to display help page to the user.
+helpString = '\033[1m' + "NAME" + '\033[0m' + "\n\t" + 'crow - A command line reconnaissance tool which collects information about the target system and documents the findings in txt files with dates and times.\n\n' + '\033[1m' + 'USAGE' + '\033[0m'+ "\n\t" + 'crow [CROW OPTION] "[Custom Options]" "[Value/Values]" "[TARGET]"' + "\n\n" + '\033[1m' + 'DESCRIPTION' + '\033[0m' +"\n\t" + "A command line tool that collects information about the target system using various types of reconnaissance techniques.\n\n\t" + f'{pingOptions[0]}, {pingOptions[1]} \n\t\tSend a ping to a target device. The default options are set to -c 5\n\n\t' + f'{rushOptions[0]}, {rushOptions[1]} \n\t\tUse this option to scan all TCP and UDP ports quickly.\n\n\t' f'{nmapOptions[0]}, {nmapOptions[1]}\n\t\t' + "Use this option to scan the services available on a target device. Use double quotes to use the options that are available to nmap's itself. The default options are set to -sV -sC -sT -A -p-" + "\n\n\t" + f'{ncOptions[0]}, {ncOptions[1]}' + "\n\t\t" + f'Do anything that you would do with netcat\'s itself.\n\n\t' + f'{torOptions[0]}, {torOptions[1]}' + "\n\t\t" + "Execute operations over a tor connection." + "\n\n\t" + f'{gbOptions[0]}, {gbOptions[1]}' + '\n\t\t' + f'Grab service banners using the last nmap scan.' + '\n\n\t' + f'{goBusterOptions[0]}, {goBusterOptions[1]}' + '\n\t\t' + f'Enumerate the target to reveal hidden subdomains or folders.' + "\n\n" + '\033[1m' + 'EXAMPLES' + '\033[0m' + "\n\t" + f'crow {pingOptions[0]} 10.10.10.10\n\t' + f'crow {pingOptions[0]} "-c 3" 10.10.10.10\n\t' + f'crow {nmapOptions[0]} 10.10.10.10\n\t' + f'crow {nmapOptions[0]} "-sT -sV -sC -A -p-" 10.10.10.10\n\t' + f'crow {ncOptions[0]} "1-65535" 10.10.10.10\n\t' + f'crow {ncOptions[0]} "-zv" "1-65535" 10.10.10.10\n\t' + f'crow {nmapOptions[0]} {gbOptions[0]} 10.10.10.10\n\t' + f'crow {torOptions[0]} {nmapOptions[0]} "-sT -sV -sC -p-" 10.10.10.10\n\t' + f'crow {torOptions[0]} {nmapOptions[0]} "-sU -sV -sC -p-" 10.10.10.10\n\t' + f'crow {torOptions[0]} {pingOptions[0]}  "-c 3" {nmapOptions[0]} "-sT -sV -sC -A" {ncOptions[0]} "-zv" "1-65535" {gbOptions[0]} 10.10.10.10\n\t' + f'crow {rushOptions[0]} 10.10.10.10\n\t' + f'crow {goBusterOptions[0]} "dir" -u -w "/usr/share/dirb/wordlists/common.txt" 10.10.10.10\n\t'
+
+# FUNCTIONS
+def main():
+    """The function which runs the entire program"""
+    # Make sure all required softwares are installed
+    if rSIC() == 5:
+        # Printing the help string if the first argument entered after crow is an help option.
+        if argv[1] in helpOptions:
+            print(helpString)
+        # Installing the security lists if the first argument which is entered after crow is in security lists' installer option.
+        elif argv[1] in secListsInstallerOpts:
+            secListInstaller(command=argv[1])
+        # Executing calling the rush function if total of 3 arguments are entered and if the second argument is an rush option.
+        elif len(argv) == 3 and argv[1] in rushOptions:
+            targetA = argv[2]
+            rush(targetA)
+        # Checking if the 2nd argument is either a ping option, nmap option, netcat option, tor option, gobuster option, or a grabbing banner option.
+        else:
+            if argv[1] in pingOptions or argv[1] in nmapOptions or argv[1] in ncOptions or argv[1] in torOptions or argv[1] in gbOptions or argv[1] in goBusterOptions:
+                # If there are no duplicates in your command execute rest of the intructions below.
+                if duplicateChecker(argv) == False:
+
+                    # Checking if a tor option is in list of arguments
+                    if torOptions[0] in argv or torOptions[1] in argv:
+                        if torOptions[0] in argv and torOptions[1] in argv:
+                            print("You can't entere same type of argument twice. Type crow %s to get more information." % helpOptions[0])
+                        else:
+                            torChoice = dNSIC()[1]
+                    else:
+                        torChoice = ""
+
+                    # 1) Ping the host, document the host's status and the date and the time.
+                    # A conditional which checks if one of the ping options are in the list of arguments.
+                    if pingOptions[0] in argv or pingOptions[1] in argv:
+                        # Making sure the user is not entering the same type of argument twice
+                        if pingOptions[0] in argv and pingOptions[1] in argv:
+                            print(f'You can\'t enter same type of argument twice. Type crow {helpOptions[0]} gett more information.')
+                            exit()
+
+                        # Finding the location of the argument
+                        elif pingOptions[0] in argv and pingOptions[1] not in argv:
+                            pingOptIndex = argv.index(pingOptions[0])
+                        elif pingOptions[1] in argv and pingOptions[0] not in argv:
+                            pingOptIndex = argv.index(pingOptions[1])
+
+                        # Locating the ping argument's sub arguments
+                        pingOptValIndex = pingOptIndex + 1
+
+                        # Pring the help page of the ping software if user entered an help option after the ping option
+                        if argv[pingOptValIndex] in helpOptions:
+                            system(f'ping {argv[pingOptValIndex]}')
+                        # If the user is not trying to see the help page of the ping software, execute the instructions below.
+                        else:
+                            # Validating if the argument entered after the ping is not a main crow argument.
+                            if "-" in argv[pingOptValIndex] and argv[pingOptValIndex] not in nmapOptions and argv[pingOptValIndex] not in ncOptions and argv[pingOptValIndex] not in gbOptions and argv[pingOptValIndex] not in torOptions:
+                                # Creating the ping's sub argument
+                                customPOpts = argv[pingOptValIndex]
+                            # If the user didn't entered a sub argument for the ping option creating a default sub argument.
+                            else:
+                                customPOpts = "-c 5"
+                            # Creating a target address variable from the last argument in the list of arguments.
+                            targetA = argv[len(argv)-1]
+                            # Printing the ping result's report location to the user.
+                            sendPing(customOpts=customPOpts, torChoice=torChoice, targetA=targetA)
+
+                    # 2) Scan the services with nmap, document the findings and the date and time.
+                    # Checking if a crow's nmap main argument is in the list of arguments
+                    if nmapOptions[0] in argv or nmapOptions[1] in argv:
+                        # Making sure the user is not entering the same type of argument twice
+                        if nmapOptions[0] in argv and nmapOptions[1] in argv:
+                            print(f'You can\'t enter same type of argument twice. Type crow {helpOptions[0]} gett more information.')
+                            exit()
+
+                        # Finding the location of crow's main nmap argument
+                        elif nmapOptions[0] in argv and nmapOptions[1] not in argv:
+                            nmapOptIndex = argv.index(nmapOptions[0])
+                        elif nmapOptions[1] in argv and nmapOptions[0] not in argv:
+                            nmapOptIndex = argv.index(nmapOptions[1])
+
+                        # Finding the location of the sub arguments
+                        nmapOptValIndex = nmapOptIndex + 1
+                        # Printing the nmap softwares help page if a help option is sued after the nmap main argument.
+                        if argv[nmapOptValIndex] in helpOptions:
+                            system(f'nmap {argv[nmapOptValIndex]}')
+                        # If the user is not trying to see the nmap's help page execute the intruction below.
+                        else:
+                            # Validating if the argument entered after the nmap is not a main crow argument.
+                            if "-" in argv[nmapOptValIndex] and argv[nmapOptValIndex] not in pingOptions and argv[nmapOptValIndex] not in ncOptions and argv[nmapOptValIndex] not in gbOptions and argv[nmapOptValIndex] not in torOptions:
+                                # Creating a sub argument from the argument which is entered after crow's main nmap argument.
+                                customNMOpts = argv[nmapOptValIndex]
+                            # Creating a default argument if the user didn't entered a sub argument after entering nmap argument.
+                            else:
+                                customNMOpts = "-sT -sV -sC -A -p-"
+                            # Creating a target address variable from the last argument from the list of arguments.
+                            targetA = argv[len(argv)-1]
+                            # Executing the nmap scan.
+                            nmapScan(customOpts=customNMOpts, torChoice=torChoice, targetA=targetA)
+
+                    # 3) Use the netcat like a swiss army knife
+                    # Checking if the user entered a netcat option as an argument.
+                    if ncOptions[0] in argv or ncOptions[1] in argv:
+                        # Making sure the user is not entering the same type of argument twice
+                        if ncOptions[0] in argv and ncOptions[1] in argv:
+                            print(f'You can\'t enter same type of argument twice. Type crow {helpOptions[0]} gett more information.')
+                            exit()
+
+                        # Finding the position of the crow's main netcat argument from it's index in the list.
+                        elif ncOptions[0] in argv:
+                            ncOptIndex = argv.index(ncOptions[0])
+                        elif ncOptions[1] in argv:
+                            ncOptIndex = argv.index(ncOptions[1])
+
+                        # Finding the position of the argument's value. Such as port description. Syntax = crow -netc "0-65535"
+                        ncOptValIndex = ncOptIndex + 1
+
+                        # Printing the help page of the netcat software if user is entering a help option after crow's main netcat argument.
+                        if argv[ncOptValIndex] in helpOptions:
+                            system(f'nc {argv[ncOptValIndex]}')
+
+                        # If the user is not trying to see the help page of the netcat software, execute the instructions below.
+                        else:
+                            # Creating a target address from the last argument in the list of arguments.
+                            targetA = argv[len(argv)-1]
+                            # Check if the argument which is entered after the crow's main netcat argument is starting with an integer
+                            try:
+                                intId = int(argv[ncOptValIndex][0:1])
+                                subNCArgv1IsI = True
+                            except:
+                                subNCArgv1IsI = False
+
+                            # Validating if the argument entered after the nmap is not a main crow argument and cannot converted to an integer.
+                            if argv[ncOptValIndex] == targetA:
+                                print(f'You need to provide a port specification to be able to use netcat features properly. Type "crow {helpOptions[0]}" to see the help page.')
+
+                            # Checking if the first sub argument is including a '-'(range of port), NOT starting with an integer not a crow's main argument.
+                            elif "-" in argv[ncOptValIndex] and subNCArgv1IsI == False and argv[ncOptValIndex] not in pingOptions and argv[ncOptValIndex] not in nmapOptions and argv[ncOptValIndex] not in gbOptions and argv[ncOptValIndex] not in torOptions:
+                                # Creating a sub argument from the argument which is entered a crow's main netcat argument.
+                                customNCOpts = argv[ncOptValIndex]
+
+                                # Checking if the argument which is entered after netcat's first sub argument is starting with an integer
+                                try:
+                                    int(argv[ncOptValIndex + 1][0:1])
+                                    subNCArgv2IsI = True
+                                except:
+                                    subNCArgv2IsI = False
+
+                                # Checking if the argument which is entered after the netcat option's first sub argument is not starting with an integer.
+                                if subNCArgv2IsI == True:
+                                    # Creating a port specifiction from the second sub argument
+                                    portSpec = argv[ncOptValIndex + 1]
+
+                            # Checking if the argument which is entered after the crow's main netcat argument is including a '-', is starting with an integer and not a crow's main argument.(Making sure it's a range of port specification without netcat sub argument.)
+                            elif "-" in argv[ncOptValIndex] and subNCArgv1IsI == True and argv[ncOptValIndex] not in pingOptions and argv[ncOptValIndex] not in nmapOptions and argv[ncOptValIndex] not in gbOptions and argv[ncOptValIndex] not in torOptions:
+                                # Creating a default argument
+                                customNCOpts = '-zv'
+                                # Creating a port specification.
+                                portSpec = argv[ncOptValIndex]
+
+                            # Checking if the argument which is entered after the crow's main netcat argument is including a '-', is starting with an integer and not a crow's main argument.(Making sure it's a single port specification without netcat sub argument.)
+                            elif "-" not in argv[ncOptValIndex] and subNCArgv1IsI == True and argv[ncOptValIndex] not in pingOptions and argv[ncOptValIndex] not in nmapOptions and argv[ncOptValIndex] not in gbOptions and argv[ncOptValIndex] not in torOptions:
+                                # Creating a default argument
+                                customNCOpts = '-zv'
+                                # Creating a port specification.
+                                portSpec = argv[ncOptValIndex]
+
+                            # Checking if the argument which is entered after the crow's main netcat argument is an another main crow argument, to manage conflicts.
+                            elif argv[ncOptValIndex] in pingOptions or argv[ncOptValIndex] in nmapOptions or argv[ncOptValIndex] in gbOptions:
+                                # Printing a text about what user supposed to do, how user can get more information.
+                                print(f'You need to provide a port specification right after the netcat({ncOptions[0]}/{ncOptions[1]}) option to be able to use netcat features properly. Ex: crow {ncOptions[0]} "10" 10.10.10.10. Type "crow {helpOptions[0]}" to see the help page.')
+
+                            # Execute the function if the port is specified.
+                            if portSpec:
+                                netcatSwissArmyKnife(customOpts=customNCOpts, torChoice=torChoice, portN=portSpec, targetA=targetA)
+
+                    # 4) Grap Service Banners with Netcat
+                    # Checking if a banner grabbing option is in the list of argument.
+                    if gbOptions[0] in argv or gbOptions[1] in argv:
+                        # Making sure the user is not entering the same type of argument twice
+                        if gbOptions[0] in argv and gbOptions[1] in argv:
+                            print(f'You can\'t enter same type of argument twice. Type crow {helpOptions[0]} to get more information.')
+                            exit()
+
+                        # Finding the location of the grabbing banner argument
+                        elif gbOptions[0] in argv and gbOptions[1] not in argv:
+                            gbOptIndex = argv.index(gbOptions[0])
+                        elif gbOptions[1] in argv and gbOptions[0] not in argv:
+                            gbOptIndex = argv.index(gbOptions[1])
+
+                        # Finding the location of grabbing bannger option's value.
+                        gbOptValIndex = gbOptIndex + 1
+
+                        # Checking if '-' in the argument which is entered after the crow's main banner grabbing option and it's not an another main crow argument.
+                        if "-" in argv[gbOptValIndex] and argv[gbOptValIndex] not in pingOptions and argv[gbOptValIndex] not in nmapOptions and argv[gbOptValIndex] not in ncOptions and argv[gbOptValIndex] not in torOptions:
+                            # Creating sub argument from the argument which is entered after crow's main banner grabbing option.
+                            customGBOpts = argv[gbOptValIndex]
+                        # Creating default options if the user didn't provide sub arguments.
+                        else:
+                            customGBOpts = "-nv"
+
+                        # Creating a target address variable from the last argument in the list of arguments.
+                        targetA = argv[len(argv)-1]
+
+                        # Grabing all service banners. Hint: You must have been executed a nmap scan first to grab all banners because grabBanners function is finding the accessing to open ports' information from the docs created by the last nmap scan.
+                        grabBanners(customOpts=customGBOpts, torChoice=torChoice, targetA=targetA)
+
+                    # 5) Execute web and directory enumeration attacks with gobuster
+                    # Checking if the user entered web enumeration with go buster option as an argument.
+                    if goBusterOptions[0] in argv or goBusterOptions[1] in argv:
+                        # Making sure the user is not entering the same type of argument twice
+                        if goBusterOptions[0] in argv and goBusterOptions[1] in argv:
+                            print(f'You can\'t enter same type of argument twice. Type crow {helpOptions[0]} to get more information.')
+                            exit()
+
+                        # Locating the gobuster enumeration argument from its index in the list of arguments.
+                        elif goBusterOptions[0] in argv and goBusterOptions[1] not in argv:
+                            goBstrOptIndex = argv.index(goBusterOptions[0])
+                        elif goBusterOptions[1] in argv and goBusterOptions[0] not in argv:
+                            goBstrOptIndex = argv.index(goBusterOptions[1])
+
+                        # Finding the location of the argument which is entered after gobuster enumeration argument.
+                        goBstrOptIndexVal = goBstrOptIndex + 1
+
+                        # Checking if the argument which is entered after the crow's main gobuster option is in goBusterModes list.
+                        if argv[goBstrOptIndexVal] in goBusterModes:
+                            # Setting the mode to the argument which is entered after the crow's main gobuster option.
+                            mode = argv[goBstrOptIndexVal]
+                            # Locating the argument which is entered after the mode.
+                            customOpt1IndexVal = goBstrOptIndexVal + 1
+                            # Checking if the argument that is entered after the mode is including '-' and not a main crow option.
+                            if "-" in argv[customOpt1IndexVal] and argv[customOpt1IndexVal] not in pingOptions and argv[customOpt1IndexVal] not in nmapOptions and argv[customOpt1IndexVal] not in ncOptions and argv[customOpt1IndexVal] not in torOptions and argv[customOpt1IndexVal] not in gbOptions:
+                                # Setting the first sub argument of the crow's go buster main argument.
+                                customGoBstrOpts1 = argv[customOpt1IndexVal]
+                                # Locating the argument which is entered after the first sub argument.
+                                customOpt2IndexVal = customOpt1IndexVal + 1
+                                # Checking if the argument which is entered after the first sub argument is including a '-' and not a crow's main option.
+                                if "-" in argv[customOpt2IndexVal] and argv[customOpt2IndexVal] not in pingOptions and argv[customOpt2IndexVal] not in nmapOptions and argv[customOpt2IndexVal] not in ncOptions and argv[customOpt2IndexVal] not in torOptions and argv[customOpt2IndexVal] not in gbOptions:
+                                    # Setting the second sub argument
+                                    customGoBstrOpts2 = argv[customOpt2IndexVal]
+                                    # Locating the argument which is entered after the second sub argument.
+                                    customOpt3IndexVal = customOpt2IndexVal + 1
+                                    # Trying to check if the argument which is entered after the second sub argument is including a '-' and not a crow's main argument.
+                                    if "-" in argv[customOpt3IndexVal] and argv[customOpt3IndexVal] not in pingOptions and argv[customOpt3IndexVal] not in nmapOptions and argv[customOpt3IndexVal] not in ncOptions and argv[customOpt3IndexVal] not in torOptions and argv[customOpt3IndexVal] not in gbOptions:
+                                        # Setting the third sub argument.
+                                        customGoBstrOpts3 = argv[customOpt3IndexVal]
+                                    else:
+                                        # Setting the third sub argument to an empty list.
+                                        customGoBstrOpts3 = ""
+                                # Checking if the user didn't entered a second sub argument
+                                else:
+                                    # Creating a path combined_subdomains security list.
+                                    cSDoms = Path(secListsFolder, 'Discovery', 'DNS', 'combined_subdomains.txt')
+                                    # Checking the security list is exists.
+                                    if cSDoms.exists() == True:
+                                        # Setting the default go buster sub argument
+                                        customGoBstrOpts2 = f'-w {str(cSDoms)}'
+                                        # Printing the default security list in debug mode.
+                                        debug(f'Setting the default security list -> {customGoBstrOpts2}')
+                                        # Finding the location of the argument which is entered after the second sub argument
+                                        customOpt3IndexVal = customOpt2IndexVal + 1
+
+                                        # Checking if the argument which is entered after the second sub argument is including a '-' and not a crow's main option.
+                                        try:
+                                            if "-" in argv[customOpt3IndexVal] and argv[customOpt3IndexVal] not in pingOptions and argv[customOpt3IndexVal] not in nmapOptions and argv[customOpt3IndexVal] not in ncOptions and argv[customOpt3IndexVal] not in torOptions and argv[customOpt3IndexVal] not in gbOptions:
+                                                # Setting the third sub argument
+                                                customGoBstrOpts3 = argv[customOpt3IndexVal]
+                                        except:
+                                            # Setting the thid sub argument to an empty string.
+                                            customGoBstrOpts3 = ""
+                                    # Checking if the path to the security list is not exist
+                                    else:
+                                        # Informing the user that the security list is not installed in his/her system.
+                                        print(f'SecLists are not installed on your system. Type crow {helpOptions[0]} to see the help page.')
+
+
+                            # Instructing the computer about what to do where the if statement is not true.
+                            else:
+                                # Setting the default 1 sub argument
+                                customGoBstrOpts1 = "-u"
+                                # Finding the location of the argument which is entered after the first gobuster sub argument.
+                                customOpt2IndexVal = customOpt1IndexVal
+                                # Checking if the argument which is enterd after the first sub argument is containing a '-' and not a main crow argument.
+                                if "-" in argv[customOpt2IndexVal] and argv[customOpt2IndexVal] not in pingOptions and argv[customOpt2IndexVal] not in nmapOptions and argv[customOpt2IndexVal] not in ncOptions and argv[customOpt2IndexVal] not in torOptions and argv[customOpt2IndexVal] not in gbOptions:
+                                    # Setting the second sub argument.
+                                    customGoBstrOpts2 = argv[customOpt2IndexVal]
+                                    # Finding the location of the argument which is entered after the second sub argument.
+                                    customOpt3IndexVal = customOpt2IndexVal + 1
+                                    # Trying to check if the argument which is entered after the second sub argument is including a '-' and not a crow's main argument.
+                                    try:
+                                        if "-" in argv[customOpt3IndexVal] and argv[customOpt3IndexVal] not in pingOptions and argv[customOpt3IndexVal] not in nmapOptions and argv[customOpt3IndexVal] not in ncOptions and argv[customOpt3IndexVal] not in torOptions and argv[customOpt3IndexVal] not in gbOptions:
+                                            customGoBstrOpts3 = argv[customOpt3IndexVal]
+                                    except:
+                                        # Setting the third sub argument to an empty list.
+                                        customGoBstrOpts3 = ""
+
+                                else:
+                                    # Creating a path combined_subdomains security list.
+                                    cSDoms = Path(secListsFolder, 'Discovery', 'DNS', 'combined_subdomains.txt')
+                                    # Checking the security list is exists.
+                                    if cSDoms.exists() == True:
+                                        # Setting the default go buster sub argument
+                                        customGoBstrOpts2 = f'-w {str(cSDoms)}'
+                                        # Printing the default security list in debug mode.
+                                        debug(f'Setting the default security list -> {customGoBstrOpts2}')
+                                        # Finding the location of the argument which is entered after the second sub argument
+                                        customOpt3IndexVal = customOpt2IndexVal + 1
+                                        # Trying to check if the argument which is entered after the second sub argument is including a '-' and not a crow's main argument.
+                                        try:
+                                            if "-" in argv[customOpt3IndexVal] and argv[customOpt3IndexVal] not in pingOptions and argv[customOpt3IndexVal] not in nmapOptions and argv[customOpt3IndexVal] not in ncOptions and argv[customOpt3IndexVal] not in torOptions and argv[customOpt3IndexVal] not in gbOptions:
+                                                customGoBstrOpts3 = argv[customOpt3IndexVal]
+                                        except:
+                                            # Setting the third sub argument to an empty list.
+                                            customGoBstrOpts3 = ""
+
+                                    # Checking if the path to the security list is not exist
+                                    else:
+                                        # Informing the user that the security list is not installed in his/her system.
+                                        print(f'SecLists are not installed on your system. Type crow -h to see the help page.')
+
+                            # Creating a target address variable from the last argument in the list or arguments.
+                            targetA = argv[len(argv) - 1]
+                            # Calling the enumWGoB function to enumerate the target
+                            enumWGoB(mode=mode, customOpts1=customGoBstrOpts1, customOpts2=customGoBstrOpts2, customOpts3=customGoBstrOpts3, torChoice=torChoice, targetA=targetA)
+
+                        # Print what went wrong.And, what user should do.
+                        else:
+                            print(f'You have to enter a valid mode to be able to use {goBusterOptions[0]} feature. Valid modes are {goBusterModes}. Type crow {helpOptions[0]} to get more information.')
+
+                # Letting the user know what went wrong.
+                else:
+                    print(f'There are duplicated arguments. There shouldn\'t be any duplicates in the arguments that you decided to enter. Bad Ex: crow {pingOptions[0]} {pingOptions[1]} 10.10.10.10. Good Ex: crow -ping 10.10.10.10')
+
+            # Letting the user know that he/she didn't entered a valid option and he/she should check the help page to get more information.
+            else:
+                print(f'You didn\'t entered a valid option. Type crow {helpOptions[0]} to see the help page.')
+
+    # Telling to user which packages are not installed and he/she should make sure all required packages are installed and available in the system.
+    else:
+        print(f'These packages {notInstalledRPackages} are not available on your system. You need to make sure all the required packages are available on your system.')
+
+
+def rSIC():
+    """A function to check if all primary required softwares are installed/avaliable on the system"""
+    # List of required softwares
+    requiredSoftwares = ["iputils-ping", "nmap", "netcat", "git", "gobuster"]
+    # A variable to keep track of the required softwares' installation status
+    requiredSIS = 0
+    # A boolean variable that tells the computer if security lists are installed or not.
+    secListsIS = False
+    # A loop that iterates over each software in the required softwares list.
+    for s in requiredSoftwares:
+        # Instructing the computer to execute system command which shows particular information which is useful to identify if a specific software is installed in the system or not.
+        softwareStatus = popen(f'apt-cache policy {s}').read()
+        # A conditional which checks if the software is not installed.
+        if "(none)" in softwareStatus:
+            # Asking user if he/she wants to install the required software.
+            installPermission = str(input(f'Crow needs to install {s} to work properly. Do you allow crow to install {s} software? (y/n): ')).lower().strip()
+            # Installing the softwares if the user answers as yes
+            if "y" in installPermission or "yes" in installPermission:
+                system(f'apt install {s} -y')
+
+        # Instructing the computer to execute system command which shows particular information which is useful to identify if a specific software is installed in the system or not.
+        softwareStatus = popen(f'apt-cache policy {s}').read()
+        # Increasing the requiredSIS variable for each installed software, to keep track of the number of softwares that are installed.
+        if "(none)" not in softwareStatus:
+            requiredSIS += 1
+
+    # Appending the software which isn't installed to the list of softwares that are not installed.
+    for sw in requiredSoftwares:
+        softwareStatus = popen(f'apt-cache policy {s}').read()
+        if "***" not in softwareStatus and "(none)" in softwareStatus:
+            notInstalledRPackages.append(f'{sw}')
+
+    # Returning the number of softwares that are installed.
+    return requiredSIS
+
+
+def dNSIC():
+    """A function to check if all required softwares for tor/darknet are installed/available on the system."""
+    # List of darknet softwares
+    darknetSoftwares = ["tor", "proxychains", "curl"]
+    # Creating a variable to keep track of the number of darknet softwares that are installed.
+    darknetSIS = 0
+
+    # Looping through each software in the darknet softwares list
+    for s in darknetSoftwares:
+        # Instructing the computer to execute system command which shows particular information which is useful to identify if a specific software is installed in the system or not.
+        sIS = popen(f'apt-cache policy {s}').read()
+        # Installing the software if it's not already installed.
+        if "(none)" in sIS:
+            # Asking to the user if he/she is allowing to installation of the software.
+            installPermission = str(input(f'Crow needs to install {s} to work properly. Do you allow crow to install {s} software? (y/n): ')).lower().strip()
+            # Creating conditional that checks the user's answer.
+            if "y" in installPermission or "yes" in installPermission:
+                # A system command that installs softwares on debian based operating systems.
+                system(f'apt install {s} -y')
+
+        # Increasing the number number of darknet softwares that are installed for each software that is installed.
+        sIS = popen(f'apt-cache policy {s}').read()
+        if "(none)" not in sIS:
+            darknetSIS += 1
+
+    # Looping through each software in the list of darknet softwares.
+    for s in darknetSoftwares:
+        # Instructing the computer to execute system command which shows particular information which is useful to identify if a specific software is installed in the system or not.
+        sIS = popen(f'apt-cache policy {s}').read()
+        # Checking if the software is not installed. And, if it's not installed installed appending it's name to the list of darknet softwares that are not installed.
+        if "(none)" in darknetSoftwares:
+            notInstalledDPackages.append(f'{s}')
+
+    # A conditional that checks if all darknet softwares are installed.
+    if darknetSIS == 3:
+        # Increasing the number number of darknet softwares that are installed for each software that is installed.
+        torStatus = popen(f'systemctl status tor').read()
+
+        # A conditional which checks if tor service is deactive
+        if "inactive (dead)" in torStatus:
+            # A system command which starts the tor service
+            system("systemctl start tor")
+
+        # A system command which restarts the tor service. Hint: It's useful when you want to change your ip address on darknet.
+        system(f'systemctl restart tor')
+        # Reading out put from a system commaand that checks the status of the tor service.
+        torStatus = popen(f'systemctl status tor').read()
+
+        # Checking if tor service is inactive.
+        if "inactive (dead)" not in torStatus:
+            # Configure tor and proxychains if it isn't configured correctly.
+            if proxychainsConfFP.exists() == True:
+                # The first word which will be searched in the configuration file.
+                searchW1 = '#dynamic_chain'
+                # The first word's replacement.
+                replaceW1 = 'dynamic_chain'
+                # The second word which will be searched in the configuration file.
+                searchW2 = "strict_chain"
+                # The second word's replacement.
+                replaceW2 = "#strict_chain"
+                # The third word which will be searched in the configuration file.
+                searchW3 = "#proxy_dns"
+                # The third word's replacement.
+                replaceW3 = "proxy_dns"
+                # Opening the proxychains configuration file in read text mode.
+                proxychainsConfFR = open(proxychainsConfFP, "rt")
+                # Reading the text from the proxychains configuration file.
+                data = proxychainsConfFR.read()
+                # Checking if the first world which will be searched is available in the configuration files text.
+                if searchW1 in data:
+                    data = data.replace(searchW1, replaceW1)
+                # Checking if the second replace keyword is not in the configuration file's text. Hint: You are using the replace keyword in this specific conditional because if you use the search keyword that word will always be found and the program will always replace that keyword and a result the number of "#" in the beginning of the line will be keep increasing.
+                if replaceW2 not in data:
+                    data = data.replace(searchW2, replaceW2)
+                # Checking if the third search keyword is in the configuration files text.
+                if searchW3 in data:
+                    data = data.replace(searchW3, replaceW3)
+
+                # Closing the configuration file.
+                proxychainsConfFR.close()
+
+                # Opening the configuration file in write text mode.
+                proxychainsConfFW = open(proxychainsConfFP, "wt")
+                # Writing the organized text/data to the configuration file.
+                proxychainsConfFW.write(data)
+                # Closing the configuration file.
+                proxychainsConfFW.close()
+
+        # Setting the tor choice variable to a string variable, which will be concatenated to beginning of the instructions.
+        torChoice = "proxychains "
+
+    # Checking if all darknet softwares are not installed.
+    else:
+        # Informing the user about the list of packages that are not available in the system.
+        print(f'These packages: {notInstalledDPackages} are not available on your system and required to scan target devices with a tor connection. You can either install install them manually(Ex: apt install tor) or you can restart the crow to install them with crows help.')
+
+    # Returning the number of darknet softwares that are installed and, the torChoice variable's value which specifies if the operations will going to be executed over a tor connection.
+    return darknetSIS, torChoice
+
+def secListInstaller(command):
+    """A function to install SecLists which is a collection of multiple securty lists during security assessments."""
+    # Checking if command is equal to install option in the secListsInstallerOpts list
+    if command == secListsInstallerOpts[0]:
+        # Checking if the folder which supposed to contain the security lists are not exist.
+        if secListsFolder.exists() == False:
+            # Creating a dictionary to install security lists
+            makedirs(secListsFolder, exist_ok=True)
+            # Cloning the repository using git
+            system(f'git clone {secListsURL} {secListsFolder}')
+        # Checking if the folder which supposed to contain security lists is empty
+        elif len(listdir(secListsFolder)) == 0:
+            # Cloning the securty lists repository using git.
+            system(f'git clone {secListsURL} {secListsFolder}')
+        # Letting the user know that security lists are already installed and available in the system.
+        else:
+            print(f'SecLists are already installed and avaliable on your system in the following location: {secListsFolder}')
+
+    # Checking if the command is uninstall from the secListsInstallerOpts list
+    elif command == secListsInstallerOpts[1]:
+        # Checking if security lists folder is exists.
+        if secListsFolder.exists() == True:
+            # Removing the security lists folder.
+            rmtree(secListsFolder)
+            # Checking if the rmtree command successfully deleted the security lists folder.
+            if secListsFolder.exists() == False:
+                print('SecLists are successfully removed.')
+        # Letting the user know that security lists are not available in his/her system.
+        else:
+            print(f'SecLists aren\'t available on your system.')
+
+
+def sendPing(customOpts, torChoice, targetA):
+    """A function to send a ping to a target device/server"""
+    # Create the current time and modify the out put as year_month_day-hour_min_seconds
+    timeNow = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+    # Creating the folder which should store the ping results
+    makedirs(pingDocsFolder, exist_ok=True)
+    # Sending a ping to a target and capture the results in a variable
+    pingResult = popen(f'{torChoice}ping {customOpts} {targetA}').read()
+    # Creating a path to store ping result findings.
+    recordPath = Path(pingDocsFolder,f'{timeNow}.txt')
+    # Creating a file to write the ping results findings.
+    with open(recordPath, 'w') as f:
+        f.write(pingResult)
+    # Printing the ping results
+    print(pingResult)
+    # Printing the file path where the results are recorded in a text file.
+    print(f'\nPING RESULTS\nReport Location: {recordPath}\n')
+    # Returning the ping result's record path.
+    return recordPath
+
+def nmapScan(customOpts, torChoice, targetA):
+    """A function to scan services on target systems/servers"""
+    # Create the current time and modify the out put as year_month_day-hour_min_seconds
+    timeNow = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+    # Creating the folder which supposed to store the nmap scan results.
+    makedirs(nmapDocsFolder, exist_ok=True)
+    # Scanning the target using nmap
+    scan = popen(f'{torChoice}nmap {customOpts} {targetA}').read()
+    # Creating a path for the nmap scan documents
+    recordPath = Path(nmapDocsFolder, f'{timeNow}.txt')
+    # Writing the scan results to a file
+    with open(recordPath, 'w') as f:
+        f.write(scan)
+    # Printing the scan results
+    print(scan)
+    # Printing the file path where record of the results are written in a text file.
+    print(f'\nNMAP RESULTS\nReport Location: {recordPath}\n')
+    # Returning the scan result's record path
+    return recordPath
+
+def netcatSwissArmyKnife(customOpts, torChoice, portN, targetA):
+    """A function to use netcat as a swiss army knife."""
+    # Create the current time and modify the out put as year_month_day-hour_min_seconds
+    timeNow = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+    # Creating the folder which supposed to store the nmap scan results.
+    makedirs(ncDocsFolder, exist_ok=True)
+    # Executing commands with netcat
+    usingTTResults = popen(f'{torChoice}nc {customOpts} {portN} {targetA}').read()
+    # Creating a path to record the results
+    recordPath = Path(ncDocsFolder, f'{timeNow}.txt')
+    # Writing the findings to a file using the path that just have been created.
+    with open(recordPath, 'w') as f:
+        f.write(usingTTResults)
+    # Printing the results
+    print(usingTTResults)
+    # Printing the path where results are written in a text file.
+    print(f'\nNETCAT RESULTS\nReport Location: {recordPath}\n')
+    # Returning the record file path
+    return recordPath
+
+def grabBanners(customOpts, torChoice, targetA):
+    """A function to grab the service's banner"""
+    # Create the current time and modify the out put as year_month_day-hour_min_seconds
+    timeNow = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+    # Creating a folder to store banner grabbing results
+    makedirs(gbDocsFolder, exist_ok=True)
+
+    # Creating an empty list for the list of arguments.
+    portNums = []
+    # Creating an empty list for the file times.
+    fileTimes = []
+    # Creating an empty list for the the lines for target file.
+    theListOfLines = []
+    # Creating an empty string for the record path becuase there aren't any open port no file will be generated.
+    recordPath = ""
+
+    # Making sure nmap documents folder is not empty.
+    if len(listdir(nmapDocsFolder)) != 0:
+        # Looping through each file in the nmap documents folder.
+        for file in listdir(nmapDocsFolder):
+            # Creating a list of values for each file to find the last created file.
+            timeCheck = [file.split("-")[0].split("_")[0], file.split("-")[0].split("_")[1], file.split("-")[0].split("_")[2]] + [file.split("-")[1].split("_")[0], file.split("-")[1].split("_")[1], file.split("-")[1].split("_")[2].split(".")[0]]
+            # Appending list of time values to fileTimes list
+            fileTimes.append(timeCheck)
+
+        # Creating the latest file's name
+        latestFile = f'{max(fileTimes)[0]}_{max(fileTimes)[1]}_{max(fileTimes)[2]}-{max(fileTimes)[3]}_{max(fileTimes)[4]}_{max(fileTimes)[5]}.txt'
+        # Creating a path to the last created file.
+        targetFP = Path(nmapDocsFolder,latestFile)
+        # Reading the contents of the last created file.
+        targetF = open(targetFP, 'r')
+        # Looping through each file in last created file.
+        for line in targetF:
+            # Checking if the line is including either 'open' or 'filtered' keywords.
+            if "open" in line or "filtered" in line:
+                # Appending the line to the list of lines
+                theListOfLines.append(line)
+
+        # Looping through each line in list of lines.
+        for line in theListOfLines:
+            # Creating a port number identifier to find the port number from the line.
+            portNumId = line.find("/")
+            # Creating a variable for the open port's number.
+            specificPortNum = line[0:portNumId]
+            # Appending the number of open port to the list of port numbers.
+            portNums.append(int(specificPortNum))
+
+        # Closing the last created file.
+        targetF.close()
+
+        # Checking if list of open port numbers is not an empty list.
+        if len(portNums) != 0:
+            # Printing a banner grabbing results header.
+            print("BANNER GRABBING RESULTS:")
+            # Looping through each port in the list of port numbers
+            for p in portNums:
+                # Grabbing the of the service which is serving the specific port
+                grabBanners = popen(f'{torChoice}nc {customOpts} {targetA} {p}').read()
+                print(grabBanners)
+                # Creating a file path to write the grabbing results
+                recordPath = Path(gbDocsFolder,f'{timeNow}-{p}.txt')
+                # Writing the enumeration results to a text file.
+                with open(recordPath, 'w') as f:
+                    f.write(grabBanners)
+                # Printing the location of the record file for each port
+                print(f'\nResult For Port - {p} -> Saved in to the reports\nReport location: {recordPath}\n')
+        # Letting the user know that there are no any open ports in the target address
+        else:
+            print(f'\nBANNER GRABBING RESULTS\nPorts: {portNums}\nReports: N/A\n')
+    # Telling to user that he/she should open the help page and get more information if the nmap documents folder is empty. Becuase, he/she should execute a nmap scan first and fill that folder.
+    else:
+        print(f'You need to execute a nmap ({nmapOptions[0]}/{nmapOptions[1]}) scan first to be able to grab banners ({gbOptions[0]}/{gbOptions[1]}).')
+
+    # Returning the file path
+    return recordPath
+
+def enumWGoB(mode, customOpts1, customOpts2, customOpts3, torChoice, targetA):
+    """A function to execute enumeration attacks"""
+    # A global list of gost buster modes
+    global goBusterModes
+    goBusterModes = ["dir", "dns", "vhost", "fuzz", "s3"]
+    # Create the current time and modify the out put as year_month_day-hour_min_seconds
+    timeNow = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+    # Creating a folder to store go buster result documents
+    makedirs(gobstrDocsFolder, exist_ok=True)
+    # Enumerating the target
+    enumerate = popen(f'{torChoice}gobuster {mode} {customOpts1} {targetA} {customOpts2} {customOpts3}').read()
+    # Creating a file path, to write results in to it.
+    recordPath = Path(gobstrDocsFolder, f'{timeNow}-{mode}.txt')
+    # Writing the findings to a text file in the record path.
+    with open(recordPath, 'w') as f:
+        f.write(enumerate)
+    # Printing the location of the record file the critical arguments that are used in the enumeration process.
+    print(f'GOBUSTER ENUMERATION RESULTS:\nReport Location: {recordPath}\nMode: {mode}\nOptions: [{customGoBstrOpts1}] - [{customGoBstrOpts2}] - [{customGoBstrOpts3}]')
+    # Returning the record file path.
+    return recordPath
+
+def duplicateChecker(values):
+    """A function to identify if there is/are any duplicates"""
+    if len(values) != len(set(values)):
+        return True
+    else:
+        return False
+
+def rush(targetA):
+    """A function which scans TCP and UDP ports quickly."""
+    system(f'proxychains nmap -sT -sU -sV -sC -A -p- {targetA}')
+
+# Evaluate if the source is being run on its own or being imported somewhere else. With this conditional in place, your code can not be imported somewhere else.
+if __name__ == '__main__':
+    main()
