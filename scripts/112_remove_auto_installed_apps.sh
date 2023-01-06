@@ -27,7 +27,7 @@ remove_auto_installed_unwanted_sofwares() {
     for app in "${auto_installed_unwanted_apps[@]}"; do
         # Checking if the application is installed.
         if [[ `$check_installation_command policy "$app"` != *"(none)"* ]]; then
-            sudo nala purge --auto-remove "$app" -yy
+            sudo apt purge --auto-remove "$app" -yy
             continue
         # Checking if the favorite app is intalled.
         else

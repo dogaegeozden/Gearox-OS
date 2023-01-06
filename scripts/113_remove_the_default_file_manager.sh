@@ -13,7 +13,7 @@ purge_the_default_file_manager() {
     # Checking if the nautilus software is installed.
     if [[ `apt-cache policy "nautilus"` != *"(none)"* ]]; then
         # Purging the nautilus file manager
-        nala purge --auto-remove "nautilus" -y
+        sudo apt purge --auto-remove "nautilus" -y
     # Checking if the nautilus file manager is not installed.
     else
         # Letting the user know that the nautilus file manager is not installed in the system.
