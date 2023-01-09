@@ -80,7 +80,7 @@ change_the_network_managers_configuration() {
 	# A function which reconfigures the NetworkManager service.
 
 	# If the original network manager configuration file is not containing particular string replace it with the gearox os's network manager configuration file
-	if [[ ! `grep -q "wifi.cloned-mac-address=preserve" $original_network_configuration_file` ]]; then
+	if [[ ! `grep "wifi.cloned-mac-address=preserve" $original_network_configuration_file` ]]; then
 		cat $new_network_configuration_file > $original_network_configuration_file
 	fi
 }
