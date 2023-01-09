@@ -13,7 +13,7 @@ scan_ports() {
     # Creating a variable called ip_addr by getting the local ip address from the sytem.
     ip_addr=`hostname -I | awk '{print $1}'`
     # Scanning all the TCP and UDP ports 
-    proxychains nmap -sT -sU -sV -sC -p- $ip_addr
+    proxychains nmap -sT -sU -sV -sC -A -p- $ip_addr
 }
 
 

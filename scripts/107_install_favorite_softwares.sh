@@ -47,7 +47,7 @@ install_softwares_with_nala() {
         # Checking if the software which is written in the line is not installed.
         if [[ `apt-cache policy "$line"` == *"(none)"* ]]; then
             # Installing the software which is written in the line.
-            nala install $line -yy;
+            sudo nala install $line -yy;
             # Continuing looping after installation.
             continue
         # Checking if the software which is written in the line is installed.
@@ -72,7 +72,7 @@ install_softwares_with_nala() {
         # Checking if the file is exists.
         else
             # Changing the file permissions.
-            sudo chmod 777 veracrypt.deb;
+            chmod 777 veracrypt.deb;
             # Installing the veracrypt
             sudo nala install ./veracrypt.deb -yy;
         fi
@@ -95,7 +95,7 @@ install_softwares_with_flatpak() {
         # Checking if the application is not installed.
         if [[ `flatpak list` != *"$app"* ]]; then
             # Installing the application.
-            flatpak install $app -y;
+            sudo flatpak install $app -y;
             # Continuing looping after installation.
             continue
         # Checking if the application is installed.

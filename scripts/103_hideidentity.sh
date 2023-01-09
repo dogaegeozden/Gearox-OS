@@ -47,28 +47,30 @@ turn_down_the_wifi_adaptor() {
 change_the_mac_address() {
 	# A function which generates random mac address.
 
-	generate_random_oui_part(){
+	generate_random_mac_address_part(){
 		# A function which generates a oui part.
 
+		# Creating a random characters long mac addres part.
 		result=${mac_address_permitted_characters:RANDOM%${#mac_address_permitted_characters}:2}
+		# Printing the mac address part.
 		echo $result
 	}
 
 	# Creating the first oui_part. Note: You must create the first part from the list_of_organizationally_unique_identifiers list.
 	oui_part1=${list_of_organizationally_unique_identifiers[ $RANDOM % ${#list_of_organizationally_unique_identifiers[@]} ]}
 	# Creating the second oui part
-	oui_part2=`generate_random_oui_part`
+	oui_part2=`generate_random_mac_address_part`
 	# Creating the third oui part
-	oui_part3=`generate_random_oui_part`
-	# Creating the fourth oui part
-	oui_part4=`generate_random_oui_part`
-	# Creating the fifth oui part
-	oui_part5=`generate_random_oui_part`
-	# Creating the sixth oui part
-	oui_part6=`generate_random_oui_part`
+	oui_part3=`generate_random_mac_address_part`
+	# Creating the fourth nic part
+	nic_part1=`generate_random_mac_address_part`
+	# Creating the fifth nic part
+	nic_part2=`generate_random_mac_address_part`
+	# Creating the sixth nic part
+	nic_part3=`generate_random_mac_address_part`
 
 	# Creating the mac_address variable.
-	mac_address=$oui_part1:$oui_part2:$oui_part3:$oui_part4:$oui_part5:$oui_part6
+	mac_address=$oui_part1:$oui_part2:$oui_part3:$nic_part1:$nic_part2:$nic_part3
 	# Printing the mac_address.
 	echo $mac_address
 
