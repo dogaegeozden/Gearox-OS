@@ -1,1 +1,1 @@
-Humbleheart=13daylight13
+ssid=password
