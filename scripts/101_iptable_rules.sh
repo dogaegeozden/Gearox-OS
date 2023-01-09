@@ -55,14 +55,15 @@ allow_input_and_output_on_loopback_interface() {
 
 append_iptables_rules() {
     # A function which appens iptables rules.
+
     # NEW: meaning that the packet has started a new connection, or otherwise associated with a connection which has not seen packets in both directions
     # ESTABLISHED: meaning that the packet is associated with a connection which has seen packets in both directions,
     # RELATED: meaning that the packet is starting a new connection, but is associated with an existing connection, such as an FTP data transfer, or an ICMP error.
 
     # Ping: Ping is a computer network administration software utility used to test the reachability of a host on an Internet Protocol (IP) network. It is available for virtually all operating systems that have networking capability, including most embedded network administration software.
-    iptables -A INPUT -i $wifi_adaptor_name -p icmp -m state --state NEW --icmp-type 8 -j ACCEPT
-    iptables -A INPUT -i $wifi_adaptor_name -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
-    iptables -A OUTPUT -o $wifi_adaptor_name -p icmp -j ACCEPT
+    # iptables -A INPUT -i $wifi_adaptor_name -p icmp -m state --state NEW --icmp-type 8 -j ACCEPT
+    # iptables -A INPUT -i $wifi_adaptor_name -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
+    # iptables -A OUTPUT -o $wifi_adaptor_name -p icmp -j ACCEPT
 
     # HTTP: Hypertext Transfer Protocol -> The purpose of the HTTP protocol is to provide a standard way for web browsers and servers to talk to each other.
     # These policies are required if you want to be able to connect to internet using http and https protocols. These are the most common ones and the standard way for web browsers and servers to talk to each other.

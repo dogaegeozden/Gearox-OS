@@ -9,7 +9,7 @@ declaring_variables() {
     # Creating a path which leads to the background image which will be set.
     background_image_path="/home/$username/Pictures/wallpapers/electro_linux_original_wp_2.png"
     # Creating a path which leads to the lock screen image which will be set.
-    lockscreenImageUri="/home/$userName/Pictures/lock_screen_images/electro_lock_screen_img.png"
+    lock_screen_image_path="/home/$userName/Pictures/lock_screen_images/electro_lock_screen_img.png"
 
 }
 
@@ -84,7 +84,7 @@ set_the_lock_screen_image() {
     # Setting the background image picture option to zoom.
     gsettings set org.gnome.desktop.screensaver picture-options 'zoom'
     # Setting the lockscreen image.
-    gsettings set org.gnome.desktop.screensaver picture-uri "${lockscreenImageUri}"
+    gsettings set org.gnome.desktop.screensaver picture-uri "${lock_screen_image_path}"
 
 }
 

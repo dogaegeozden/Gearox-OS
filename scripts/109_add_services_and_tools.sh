@@ -35,6 +35,7 @@ load_my_command_line_tools() {
 	for command_line_tool in `ls $command_line_tools_folder_path`; do
 		# Changing the file permissions of each tool.
 		chmod 741 $command_line_tools_folder_path$command_line_tool
+		chown $username:$username $command_line_tools_folder_path$command_line_tool
 		# Copying each tool to /usr/bin folder. Hint: This is the folder which contains the command linux commands.
 		cp $command_line_tools_folder_path$command_line_tool "/usr/bin/"
 	done

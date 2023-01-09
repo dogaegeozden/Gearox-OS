@@ -54,21 +54,23 @@ install_softwares_with_nala() {
     done
 
     # Checking if veracrypt is not installed.
-    if [[ `apt-cache policy "veracrypt"` == *"(none)"* ]]; then
+    if [[ `apt-cache policy "veracrypt"` != *"(none)"* ]]; then
+        # Changing the current working directory.
+        cd /opt
         # Checking if file is not exists.
         if [[ ! -f /opt/veracrypt.deb ]]; then
             # Send a get request to download the file.
-            curl -L https://launchpad.net/veracrypt/trunk/1.25.9/+download/veracrypt-1.25.9-Debian-11-amd64.deb -o opt/veracrypt.deb;
+            curl -L https://launchpad.net/veracrypt/trunk/1.25.9/+download/veracrypt-1.25.9-Debian-11-amd64.deb -o veracrypt.deb;
             # Changing the file permissions.
-            chmod 777 opt/veracrypt.deb;
+            chmod 777 veracrypt.deb;
             # Installing the veracrypt
-            nala install ./opt/veracrypt.deb -yy;
+            sudo nala install ./veracrypt.deb -yy;
         # Checking if the file is exists.
         else
             # Changing the file permissions.
-            chmod 777 opt/veracrypt.deb;
+            sudo chmod 777 veracrypt.deb;
             # Installing the veracrypt
-            nala install ./opt/veracrypt.deb -yy;
+            sudo nala install ./veracrypt.deb -yy;
         fi
     # Checking if the software is already installed.
     else
