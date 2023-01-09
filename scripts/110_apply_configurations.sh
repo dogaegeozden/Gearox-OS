@@ -19,9 +19,9 @@ declare_variables() {
 	search2="socks4 	127.0.0.1 9050"
 	replace2="socks5 	127.0.0.1 9050"
 	# Creating a list called list_of_user_alias_strings.
-	list_of_user_alias_strings=("#Gearox Home Aliases" "alias changeip='systemctl restart tor.service'" "alias torstop='systemctl stop tor.service'" "alias torstart='systemctl start tor.service'" "alias torstatus='systemctl status tor.service'" "alias androidstudio='bash /home/$userName/Downloads/android-studio/bin/studio.sh'")
+	list_of_user_alias_strings=("# Electro Linux" "alias changeip='systemctl restart tor.service'" "alias torstop='systemctl stop tor.service'" "alias torstart='systemctl start tor.service'" "alias torstatus='systemctl status tor.service'")
 	# Creating a list called list_of_root_alias_strings
-	list_of_root_alias_strings=("#Gearox Home Aliases" "alias changeip='systemctl restart tor.service'" "alias myip='proxychains curl ifconfig.io'" "alias torstop='systemctl stop tor.service'" "alias torstart='systemctl start tor.service'" "alias torstatus='systemctl status tor.service'")
+	list_of_root_alias_strings=("# Electro Linux" "alias changeip='systemctl restart tor.service'" "alias myip='proxychains curl ifconfig.io'" "alias torstop='systemctl stop tor.service'" "alias torstart='systemctl start tor.service'" "alias torstatus='systemctl status tor.service'")
 }
 
 main() {
@@ -79,7 +79,7 @@ create_the_user_aliases() {
 	# Looping through each alias in the list_of_user_alias_strings.
 	for alias in "${list_of_user_alias_strings[@]}"; do
 		# Checking if the alias is already created in the user's .bashrc file.
-		if [[ ! `grep -q "$alias" "/home/$username/.bashrc"` ]]; then
+		if [[ ! `grep "$alias" "/home/$username/.bashrc"` ]]; then
 			# Appending alias to the end of the user's .bashrc file.
 			echo "$alias" >> "/home/$username/.bashrc"
 		fi
@@ -94,7 +94,7 @@ create_the_root_aliases() {
 
 	# Looping through each alias in the list_of_root_alias_strings.
 	for alias in "${list_of_root_alias_strings[@]}"; do
-		if [[ ! `grep -q "$alias" "/root/.bashrc"` ]]; then
+		if [[ ! `grep "$alias" "/root/.bashrc"` ]]; then
 			echo "$alias" >> "/root/.bashrc"
 		fi
 	done

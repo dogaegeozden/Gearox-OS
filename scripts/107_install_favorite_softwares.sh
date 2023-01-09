@@ -9,6 +9,8 @@ declare_variables() {
     apt_app_list_file="../apps.list"
     # Creating a path which leads to the flatpak_apps.list file.
     flatpak_app_list_file="../flatpak_apps.list"
+    # Creating a list of virtual environment wrapper profile lines
+    list_of_virtual_env_profile_lines=("export WORKON_HOME=$HOME/.virtualenvs" "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "export PROJECT_HOME=$HOME/Devel" "source /usr/local/bin/virtualenvwrapper.sh")
 }
 
 main() {
@@ -22,6 +24,8 @@ main() {
     install_softwares_with_nala
     # Calling the install_softwares_with_flatpak function.
     install_softwares_with_flatpak
+    # Calling the install_virtual_env_wrapper function.
+    install_virtual_env_wrapper
     # Calling the clone_security_lists function.
     clone_security_lists
     # Calling the install_cheat_sheets function.
@@ -104,23 +108,25 @@ install_softwares_with_flatpak() {
 
 install_virtual_env_wrapper() {
 	# A function which installs the python virtual environment wrapper.
-	if [[ `pip3 freeze` != *"virtualenvwrapper"* ]]; then
-		sudo pip3 install virtualenvwrapper
-		if [[ ! `grep -q "export WORKON_HOME=$HOME/.virtualenvs" "/home/$username/.bashrc"` ]]; then
-			export WORKON_HOME=$HOME/.virtualenvs >> /home/$username/.bashrc
-		fi
-		if [[ ! `grep -q "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "/home/$username/.bashrc"` ]]; then
-			export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3 >> /home/$username/.bashrc
-		fi
-		if [[ ! `grep -q "export PROJECT_HOME=$HOME/Devel" "/home/$username/.bashrc"` ]]; then
-			export PROJECT_HOME=$HOME/Devel >> /home/$username/.bashrc
-		fi
-		if [[ ! `grep -q "source /usr/local/bin/virtualenvwrapper.sh" "/home/$username/.bashrc"` ]]; then
-			source /usr/local/bin/virtualenvwrapper.sh >> /home/$username/.bashrc
-		fi
-	fi
-}
 
+    # Checking if the virtualenvwrapper is not installed.
+	if [[ `pip3 freeze` != *"virtualenvwrapper"* ]]; then
+        # Installing the virtualenvwrapper python package.
+		sudo pip3 install virtualenvwrapper
+        # Looping through each line in the list_of_virtual_env_profile_lines list
+        for line in "${list_of_virtual_env_profile_lines[@]}"; do
+            # Checking if the line is not written the user's .bashrc file.
+            if [[ ! `grep "$line" "/home/$username/.bashrc"` ]]; then
+                # Appending the line ot the user's .bashrc file.
+                echo "$line" >> "/home/$username/.bashrc"
+            fi
+        done
+    # Checking if the virtualenvwrapper package is installed.
+	else 
+        # Letting the user know that the package is available in the system.
+        echo "virtualenvwrapper is available in the system."
+    fi
+}
 
 clone_security_lists() {
     # A function which clones security lists from github.
