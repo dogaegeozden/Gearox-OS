@@ -54,7 +54,7 @@ install_softwares_with_nala() {
     done
 
     # Checking if veracrypt is not installed.
-    if [[ `apt-cache policy "veracrypt"` != *"(none)"* ]]; then
+    if [[ `apt-cache policy "veracrypt"` == *"(none)"* ]]; then
         # Changing the current working directory.
         cd /opt
         # Checking if file is not exists.
@@ -102,13 +102,33 @@ install_softwares_with_flatpak() {
     done
 }
 
+install_virtual_env_wrapper() {
+	# A function which installs the python virtual environment wrapper.
+	if [[ `pip3 freeze` != *"virtualenvwrapper"* ]]; then
+		sudo pip3 install virtualenvwrapper
+		if [[ ! `grep -q "export WORKON_HOME=$HOME/.virtualenvs" "/home/$username/.bashrc"` ]]; then
+			export WORKON_HOME=$HOME/.virtualenvs >> /home/$username/.bashrc
+		fi
+		if [[ ! `grep -q "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "/home/$username/.bashrc"` ]]; then
+			export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3 >> /home/$username/.bashrc
+		fi
+		if [[ ! `grep -q "export PROJECT_HOME=$HOME/Devel" "/home/$username/.bashrc"` ]]; then
+			export PROJECT_HOME=$HOME/Devel >> /home/$username/.bashrc
+		fi
+		if [[ ! `grep -q "source /usr/local/bin/virtualenvwrapper.sh" "/home/$username/.bashrc"` ]]; then
+			source /usr/local/bin/virtualenvwrapper.sh >> /home/$username/.bashrc
+		fi
+	fi
+}
+
+
 clone_security_lists() {
     # A function which clones security lists from github.
 
     # Checking if the directory is not exists.
-    if [[ ! -d "/home/$userName/Downloads/SecLists" ]]; then
+    if [[ ! -d "/home/$username/Downloads/SecLists/" ]]; then
         # Cloning the repository to downloads.
-        git clone https://github.com/danielmiessler/SecLists "/home/$username/Downloads";
+        git clone https://github.com/danielmiessler/SecLists "/home/$username/Downloads/SecLists";
     # Checking if the directory is exists.
     else
         # Telling to user that, the security lists are already available in the system.
@@ -119,8 +139,8 @@ clone_security_lists() {
 install_cheat_sheets() {
     # A function which installs cheat sheets.
 
-    # Checking if the directory is not exists.
-    if [[ ! -d "/usr/local/bin/cheat" ]]; then
+    # Checking if the file is not exists.
+    if [[ ! -f "/usr/local/bin/cheat" ]]; then
         # Changing the current working directory to /tmp
         cd /tmp
         # Download the cheat sheets
