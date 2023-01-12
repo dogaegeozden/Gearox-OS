@@ -108,6 +108,8 @@ install_softwares_with_flatpak() {
 
 install_virtual_env_wrapper() {
 	# A function which installs the python virtual environment wrapper.
+    
+    # Note: The reason why I'm not installing bunch of python package is that, it's better to create a virtual environment for each project, and install it's requirements, recursively from a requirements.txt file. Ex: pip3 install -r requirements.txt
 
     # Checking if the virtualenvwrapper is not installed.
 	if [[ `pip3 freeze` != *"virtualenvwrapper"* ]]; then
