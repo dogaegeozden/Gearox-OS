@@ -3,6 +3,7 @@
 declare_variables() {
     # A function which declares variables.
 
+    the_script_path=`pwd`
     # Creating a variable called user name.
     username=${SUDO_USER:-${USER}}
     # Creating a path which leads to the apps.list file.
@@ -11,6 +12,8 @@ declare_variables() {
     flatpak_app_list_file="../flatpak_apps.list"
     # Creating a list of virtual environment wrapper profile lines
     list_of_virtual_env_profile_lines=("export WORKON_HOME=$HOME/.virtualenvs" "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "export PROJECT_HOME=$HOME/Devel" "source /usr/local/bin/virtualenvwrapper.sh")
+    # Creating a list for the command line tools that I created.
+    list_of_urls=("https://github.com/dogaegeozden/obscuro/releases/download/encryption/obscuro.deb")
 }
 
 main() {
@@ -22,6 +25,8 @@ main() {
     install_nala_package_manager
     # Calling the install_softwares_with_nala function.
     install_softwares_with_nala
+    # Calling the install_softwares_with_dpkg function.
+    install_softwares_with_dpkg
     # Calling the install_softwares_with_flatpak function.
     install_softwares_with_flatpak
     # Calling the install_virtual_env_wrapper function.
@@ -47,7 +52,7 @@ install_softwares_with_nala() {
         # Checking if the software which is written in the line is not installed.
         if [[ `apt-cache policy "$line"` == *"(none)"* ]]; then
             # Installing the software which is written in the line.
-            sudo nala install $line -yy;
+            nala install $line -yy;
             # Continuing looping after installation.
             continue
         # Checking if the software which is written in the line is installed.
@@ -67,26 +72,35 @@ install_softwares_with_nala() {
             curl -L https://launchpad.net/veracrypt/trunk/1.25.9/+download/veracrypt-1.25.9-Debian-11-amd64.deb -o veracrypt.deb;
             # Changing the file permissions.
             chmod 777 veracrypt.deb;
-            # Installing the veracrypt
-            sudo nala install ./veracrypt.deb -yy;
+            # Checking if veracrypt is not installed.
+            if [[ `apt policy veracrypt` == *"(none)"* ]]; then
+                # Installing the veracrypt
+                nala install ./veracrypt.deb -yy;
+            # Checking if veracrypt is already installed
+            else
+                # Letting the user know that veracrypt is already available in the system.
+                echo "Veracrypt is already available in the system."
+            fi
         # Checking if the file is exists.
         else
             # Changing the file permissions.
             chmod 777 veracrypt.deb;
             # Installing the veracrypt
-            sudo nala install ./veracrypt.deb -yy;
+            nala install ./veracrypt.deb -yy;
         fi
     # Checking if the software is already installed.
     else
         # Telling to user that, the application is already installed.
         echo "Veracrypt is already installed. And, it's available in /opt";
-    fi
-
+    fi         
 }
 
 install_softwares_with_flatpak() {
-    # A function which installes softwares using the flatpak package manager.
+    # A function which installes softwares from flathub using the flatpak package manager.
 
+    # Changing the current working directory
+    cd $the_script_path
+    
     # Adding the flatpak remote repository Hint: A url which tells to flatpak where to look for packages.
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
@@ -95,7 +109,7 @@ install_softwares_with_flatpak() {
         # Checking if the application is not installed.
         if [[ `flatpak list` != *"$app"* ]]; then
             # Installing the application.
-            sudo flatpak install $app -y;
+            flatpak install $app -y;
             # Continuing looping after installation.
             continue
         # Checking if the application is installed.
@@ -106,15 +120,59 @@ install_softwares_with_flatpak() {
     done
 }
 
+install_softwares_with_dpkg() {
+    # A function which installes softwares with dpkg
+    
+    # Changing the current working directory to opt
+    cd /opt;
+    # Iterating over each url in the list_of_urls
+    for url in "${list_of_urls[@]}"; do
+        # Creating an array from the url by spliting it the delimeter which is created above.
+        IFS='/' read -a strarr <<< "$url";
+        # Calculating the length of the array
+        length_of_the_array="${#strarr[@]}";
+        # Calculating the target's index number
+        target_index=$(($length_of_the_array-1));
+        # Creating a variable called installer_name
+        installer_name=${strarr[$target_index]}
+        # Creating a variable to store the application's name
+        app_name=${installer_name:0:$((${#installer_name}-4))}
+    
+        # Checking if the installer is not available in the system.
+        if [[ ! -f "/opt/$installer_name" ]]; then
+            # Downloading the installer
+            curl -L "$url" -o "$installer_name";
+        else
+            echo "Installer $installer_name is already available in the system."
+        fi
+    
+        # Checking if the package is not installed
+        if [[ `apt policy "$app_name"` == *"(none)"* ]]; then
+            # Starting the installers code.
+            dpkg -i "$installer_name"
+        # Checking if the application is already installed.
+        else
+            # Letting the user know that the application is already available in the system.
+            echo "$app_name is already available in the system."
+        fi
+
+        # Checking if the installer is available in the path
+        if [[ -f "/opt/$installer_name" ]]; then
+            # Deleting the installer
+            rm "$installer_name";
+        fi
+    done
+}
+
 install_virtual_env_wrapper() {
 	# A function which installs the python virtual environment wrapper.
     
     # Note: The reason why I'm not installing bunch of python package is that, it's better to create a virtual environment for each project, and install it's requirements, recursively from a requirements.txt file. Ex: pip3 install -r requirements.txt
 
     # Checking if the virtualenvwrapper is not installed.
-	if [[ `pip3 freeze` != *"virtualenvwrapper"* ]]; then
+	if [[ `su - $username -c "pip3 freeze"` != *"virtualenvwrapper"* ]]; then
         # Installing the virtualenvwrapper python package.
-		sudo pip3 install virtualenvwrapper
+		su - $username -c "pip3 install virtualenvwrapper"
         # Looping through each line in the list_of_virtual_env_profile_lines list
         for line in "${list_of_virtual_env_profile_lines[@]}"; do
             # Checking if the line is not written the user's .bashrc file.

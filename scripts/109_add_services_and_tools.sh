@@ -11,8 +11,8 @@ declare_variables() {
 	services_folder_path="../services/"
 	# Creating a path to the folder where the startup applications are located on debian based operating system.
 	startup_app_folder_path="~/.config/autostart/"
+	# Creating a path which leads to the start_up_applications folder.
 	my_startup_apps_folder="../startup_applications/"
-
 }
 
 main() {

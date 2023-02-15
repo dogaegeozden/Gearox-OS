@@ -60,8 +60,8 @@ append_iptables_rules() {
     # RELATED: meaning that the packet is starting a new connection, but is associated with an existing connection, such as an FTP data transfer, or an ICMP error.
 
     # Ping: Ping is a computer network administration software utility used to test the reachability of a host on an Internet Protocol (IP) network. It is available for virtually all operating systems that have networking capability, including most embedded network administration software.
-    #ip6tables -A INPUT -i $wifi_adaptor_name -p icmp -m state --state NEW --icmp-type 8 -j ACCEPT
-    #ip6tables -A INPUT -i $wifi_adaptor_name -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
+    #ip6tables -A INPUT -i $wifi_adaptor_name -p icmp -m conntrack --ctstate NEW --icmp-type 8 -j ACCEPT
+    #ip6tables -A INPUT -i $wifi_adaptor_name -p icmp -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
     #ip6tables -A OUTPUT -o $wifi_adaptor_name -p icmp -j ACCEPT
 
     # HTTP: Hypertext Transfer Protocol -> The purpose of the HTTP protocol is to provide a standard way for web browsers and servers to talk to each other.
@@ -77,13 +77,17 @@ append_iptables_rules() {
     # Note: You should allow incoming and out going communications to this port if you want to use URLs instead of ipaddresses. ExURL: https://dogaege.pythonanywhere.com
     ip6tables -A INPUT -i $wifi_adaptor_name -p udp --sport 53 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
     ip6tables -A OUTPUT -o $wifi_adaptor_name -p udp --dport 53 -m udp -j ACCEPT
-
-    # SSH: Secure Shell -> The Secure Shell Protocol (SSH) is a cryptographic network protocol for operating network services securely over an unsecured network. Its most notable applications are remote login and command-line execution. SSH applications are based on a client–server architecture,
-    # ip6tables -A INPUT -p tcp -m conntrack --ctstate ESTABLISHED,RELATED --sport 22 -j ACCEPT
-    # ip6tables -A OUTPUT -p tcp --dport 22 -j ACCEPT
+    
+    # SSH: The Secure Shell Protocol (SSH) is a cryptographic network protocol for operating network services securely over an unsecured network. Its most notable applications are remote login and command-line execution.
+    # Puting input -> Packages coming into the destionation port(Destination Port: It is the other machine's port, thats why you are only allowing when the state is either new or established. Because your security is what matters most for you, not the other's.)
+    ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
+    ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 22 -j ACCEPT
+    # Geting output -> Packages coming into  the source port(Source Port: It is your machine's port, that's why you are only allowing when the state is established. Becase your security is what matters most for you.)
+    ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
+    ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 22 -j ACCEPT
 
     # NTP: Network Time Protocol -> The purpose of this protocol to syncronize the system's time.
-    #ip6tables -A INPUT -i $wifi_adaptor_name -p udp -m state --state ESTABLISHED,RELATED --dport 123 -j ACCEPT
+    #ip6tables -A INPUT -i $wifi_adaptor_name -p udp -m conntrack --ctstate ESTABLISHED,RELATED --dport 123 -j ACCEPT
     #ip6tables -A OUTPUT -o $wifi_adaptor_name -p udp -m udp --sport 123 -j ACCEPT
 
     # CUPS: Common UNIX Printing System -> The purpose of cups is to allow a computer to act as a priting server so it can accept printing jobs and etc.
@@ -94,24 +98,16 @@ append_iptables_rules() {
 
     # EMAIL: These settings are for being able to use email services.
     # STMP: The Simple Mail Transfer Protocol (SMTP) is an internet standard communication protocol for electronic mail transmission. Mail servers and other message transfer agents use SMTP to send and receive mail messages.
-    #ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m state --state ESTABLISHED,RELATED --sport 465 -j ACCEPT
+    #ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED,RELATED --sport 465 -j ACCEPT
     #ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m tcp --dport 465 -j ACCEPT
 
     # IMAP: The Internet Message Access Protocol (IMAP) is an Internet standard protocol used by email clients to retrieve email messages from a mail server over a TCP/IP connection.
-    #ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m state --state ESTABLISHED,RELATED --sport 993 -j ACCEPT
+    #ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED,RELATED --sport 993 -j ACCEPT
     #ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m tcp --dport 993 -j ACCEPT
 
     # POP3: The Post Office Protocol (POP3) is an Internet standard protocol used by local email software clients to retrieve emails from a remote mail server over a TCP/IP connection, these email clients may require the configuration of Post Office Protocol (or POP3) before messages can be downloaded from the server.
     #ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED,RELATED --sport 995 -j ACCEPT
     #ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m tcp --dport 995 -j ACCEPT
-
-    # SSH: The Secure Shell Protocol (SSH) is a cryptographic network protocol for operating network services securely over an unsecured network. Its most notable applications are remote login and command-line execution.
-    # Puting input -> Packages coming into the destionation port(Destination Port: It is the other machine's port, thats why you are only allowing when the state is either new or established. Because your security is what matters most for you, not the other's.)
-    #ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
-    #ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 22 -j ACCEPT
-    # Geting output -> Packages coming into  the source port(Source Port: It is your machine's port, that's why you are only allowing when the state is established. Becase your security is what matters most for you.)
-    #ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
-    #ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 22 -j ACCEPT
 
     # DHCP: The Dynamic Host Configuration Protocol (DHCP) is a network management protocol used on Internet Protocol (IP) networks for automatically assigning IP addresses and other communication parameters to devices connected to the network using a client–server architecture. If you are using a static ip address you don't need it.
     #ip6tables -A INPUT -i $wifi_adaptor_name -p udp -m conntrack --ctstate ESTABLISHED,RELATED --sport 67:68 -j ACCEPT
