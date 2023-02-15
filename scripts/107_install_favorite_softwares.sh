@@ -121,13 +121,13 @@ install_softwares_with_flatpak() {
 }
 
 install_softwares_with_dpkg() {
-    # A function which installes softwares with dpkg
+    # A function which installs softwares with dpkg
     
     # Changing the current working directory to opt
     cd /opt;
     # Iterating over each url in the list_of_urls
     for url in "${list_of_urls[@]}"; do
-        # Creating an array from the url by spliting it the delimeter which is created above.
+        # Creating an array from the url by spliting it with the delimeter.
         IFS='/' read -a strarr <<< "$url";
         # Calculating the length of the array
         length_of_the_array="${#strarr[@]}";
