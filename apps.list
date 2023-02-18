@@ -31,3 +31,5 @@ default-libmysqlclient-dev
 build-essential
 virtualbox
 virtualbox-ext-pack
+tree
+libgtk-4-dev

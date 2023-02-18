@@ -11,6 +11,7 @@
 # 3) https://www.linuxfromscratch.org/lfs/download.html
 # 4) https://www.linuxfromscratch.org/blfs/download.html
 # blfs -> beyond linux from scratch is the second book which is teaching how to install desktop environments and web browsers and etc.
+# Note: You can use chatGPT, debootstrap and chroot to create your own debian based operating system.
 
 declaring_variables() {
 	# A function which decalres variables.

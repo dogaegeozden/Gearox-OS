@@ -13,7 +13,7 @@ declare_variables() {
     # Creating a list of virtual environment wrapper profile lines
     list_of_virtual_env_profile_lines=("export WORKON_HOME=$HOME/.virtualenvs" "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "export PROJECT_HOME=$HOME/Devel" "source /usr/local/bin/virtualenvwrapper.sh")
     # Creating a list for the command line tools that I created.
-    list_of_urls=("https://github.com/dogaegeozden/obscuro/releases/download/encryption/obscuro.deb")
+    list_of_urls=("https://github.com/dogaegeozden/obscuro/releases/download/encryption/obscuro.deb", "https://github.com/dogaegeozden/arcj/releases/download/Anonymity/arcj.deb", "https://github.com/dogaegeozden/infarc/releases/download/compressing/infarc.deb", "https://github.com/dogaegeozden/crow/releases/download/cyber-security/crow.deb")
 }
 
 main() {
@@ -92,32 +92,25 @@ install_softwares_with_nala() {
     else
         # Telling to user that, the application is already installed.
         echo "Veracrypt is already installed. And, it's available in /opt";
-    fi         
-}
-
-install_softwares_with_flatpak() {
-    # A function which installes softwares from flathub using the flatpak package manager.
-
-    # Changing the current working directory
-    cd $the_script_path
+    fi
     
-    # Adding the flatpak remote repository Hint: A url which tells to flatpak where to look for packages.
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    # Checking if ngrok is not installed
+    if [[ `apt policy ngrok` == *"(none)"* ]]; then
+        # Sending a get request to ngrok's asc file silently, creating a new file which contains the request out put and redicrecting both stdout and stderr in to /dev/null
+        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null 
+        # Reading ngrok's sources information and creating new file with this information in appropriate location.
+        echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list 
+        # Updating the packages' information
+        sudo apt update 
+        # Installing the software
+        sudo apt install ngrok
+    # Checking if ngrok is installed
+    else
+        # Telling the user that ngrok is already installed and available in the system.
+        echo "Ngrok is available in the system."
+    fi
 
-    # Looping through each application in the flatpak_apps.list file.
-    for app in $(cat $flatpak_app_list_file);do
-        # Checking if the application is not installed.
-        if [[ `flatpak list` != *"$app"* ]]; then
-            # Installing the application.
-            flatpak install $app -y;
-            # Continuing looping after installation.
-            continue
-        # Checking if the application is installed.
-        else
-            # Telling to user that the software is already installed.
-            echo "$app is already installed";
-        fi
-    done
+    
 }
 
 install_softwares_with_dpkg() {
@@ -160,6 +153,31 @@ install_softwares_with_dpkg() {
         if [[ -f "/opt/$installer_name" ]]; then
             # Deleting the installer
             rm "$installer_name";
+        fi
+    done
+}
+
+install_softwares_with_flatpak() {
+    # A function which installes softwares from flathub using the flatpak package manager.
+
+    # Changing the current working directory
+    cd $the_script_path
+    
+    # Adding the flatpak remote repository Hint: A url which tells to flatpak where to look for packages.
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+    # Looping through each application in the flatpak_apps.list file.
+    for app in $(cat $flatpak_app_list_file);do
+        # Checking if the application is not installed.
+        if [[ `flatpak list` != *"$app"* ]]; then
+            # Installing the application.
+            flatpak install $app -y;
+            # Continuing looping after installation.
+            continue
+        # Checking if the application is installed.
+        else
+            # Telling to user that the software is already installed.
+            echo "$app is already installed";
         fi
     done
 }
