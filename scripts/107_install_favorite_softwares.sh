@@ -13,7 +13,7 @@ declare_variables() {
     # Creating a list of virtual environment wrapper profile lines
     list_of_virtual_env_profile_lines=("export WORKON_HOME=$HOME/.virtualenvs" "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "export PROJECT_HOME=$HOME/Devel" "source /usr/local/bin/virtualenvwrapper.sh")
     # Creating a list for the command line tools that I created.
-    list_of_urls=("https://github.com/dogaegeozden/obscuro/releases/download/encryption/obscuro.deb", "https://github.com/dogaegeozden/arcj/releases/download/Anonymity/arcj.deb", "https://github.com/dogaegeozden/infarc/releases/download/compressing/infarc.deb", "https://github.com/dogaegeozden/crow/releases/download/cyber-security/crow.deb")
+    my_apps_list_file="../myapps.list"
 }
 
 main() {
@@ -116,10 +116,9 @@ install_softwares_with_nala() {
 install_softwares_with_dpkg() {
     # A function which installs softwares with dpkg
     
-    # Changing the current working directory to opt
-    cd /opt;
+
     # Iterating over each url in the list_of_urls
-    for url in "${list_of_urls[@]}"; do
+    for url in $(cat $my_apps_list_file);do
         # Creating an array from the url by spliting it with the delimeter.
         IFS='/' read -a strarr <<< "$url";
         # Calculating the length of the array
@@ -130,6 +129,8 @@ install_softwares_with_dpkg() {
         installer_name=${strarr[$target_index]}
         # Creating a variable to store the application's name
         app_name=${installer_name:0:$((${#installer_name}-4))}
+        # Changing the current working directory to opt
+        cd /opt
     
         # Checking if the installer is not available in the system.
         if [[ ! -f "/opt/$installer_name" ]]; then
@@ -149,11 +150,6 @@ install_softwares_with_dpkg() {
             echo "$app_name is already available in the system."
         fi
 
-        # Checking if the installer is available in the path
-        if [[ -f "/opt/$installer_name" ]]; then
-            # Deleting the installer
-            rm "$installer_name";
-        fi
     done
 }
 
