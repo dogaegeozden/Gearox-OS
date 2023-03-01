@@ -115,7 +115,6 @@ install_softwares_with_nala() {
 
 install_softwares_with_dpkg() {
     # A function which installs softwares with dpkg
-    
 
     # Iterating over each url in the list_of_urls
     for url in $(cat $my_apps_list_file);do
