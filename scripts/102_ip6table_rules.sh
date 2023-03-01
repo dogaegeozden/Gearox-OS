@@ -59,6 +59,9 @@ append_iptables_rules() {
     # ESTABLISHED: meaning that the packet is associated with a connection which has seen packets in both directions,
     # RELATED: meaning that the packet is starting a new connection, but is associated with an existing connection, such as an FTP data transfer, or an ICMP error.
 
+    # SOURCE: Source is your machine. --sport is the port in your machine
+    # DESTINATION: Destionation is the other machine. --dport is the port in the other machine.
+    
     # Ping: Ping is a computer network administration software utility used to test the reachability of a host on an Internet Protocol (IP) network. It is available for virtually all operating systems that have networking capability, including most embedded network administration software.
     #ip6tables -A INPUT -i $wifi_adaptor_name -p icmp -m conntrack --ctstate NEW --icmp-type 8 -j ACCEPT
     #ip6tables -A INPUT -i $wifi_adaptor_name -p icmp -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -116,8 +119,6 @@ append_iptables_rules() {
     # MySQL: My Structured Query Language. MySQL is a relational database management system based on SQL – Structured Query Language. The application is used for a wide range of purposes, including data warehousing, e-commerce, and logging applications.
     # ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -s 2001:0db8:85a3:0000:0000:8a2e:0370:7334 --dport 3306 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
     # ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp --sport 3306 -m conntrack --ctstate ESTABLISHED -j ACCEPT
-
-    # OpenVPN: OpenVPN is a virtual private network (VPN) system that implements techniques to create secure point-to-point or site-to-site connections in routed or bridged configurations and remote access facilities.
 }
 
 # Executing the main function.
