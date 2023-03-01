@@ -59,7 +59,10 @@ append_iptables_rules() {
     # NEW: meaning that the packet has started a new connection, or otherwise associated with a connection which has not seen packets in both directions
     # ESTABLISHED: meaning that the packet is associated with a connection which has seen packets in both directions,
     # RELATED: meaning that the packet is starting a new connection, but is associated with an existing connection, such as an FTP data transfer, or an ICMP error.
-
+    
+    # SOURCE: Source is your machine. --sport is the port in your machine
+    # DESTINATION: Destionation is the other machine. --dport is the port in the other machine.
+    
     # Ping: Ping is a computer network administration software utility used to test the reachability of a host on an Internet Protocol (IP) network. It is available for virtually all operating systems that have networking capability, including most embedded network administration software.
     # iptables -A INPUT -i $wifi_adaptor_name -p icmp -m conntrack --ctstate NEW --icmp-type 8 -j ACCEPT
     # iptables -A INPUT -i $wifi_adaptor_name -p icmp -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -118,13 +121,6 @@ append_iptables_rules() {
     # iptables -A INPUT -i $wifi_adaptor_name -p tcp -s 10.10.10.10/24 --dport 3306 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
     # iptables -A OUTPUT -o $wifi_adaptor_name -p tcp --sport 3306 -m conntrack --ctstate ESTABLISHED -j ACCEPT
 
-    # OpenVPN: OpenVPN is a virtual private network (VPN) system that implements techniques to create secure point-to-point or site-to-site connections in routed or bridged configurations and remote access facilities.
-    # iptables -A INPUT -i $wifi_adaptor_name -p udp -m conntrack --ctstate NEW --dport 1194 -j ACCEPT
-    # iptables -A INPUT -i tun+ -j ACCEPT
-    # iptables -A FORWARD -i tun+ -j ACCEPT
-    # iptables -A FORWARD -i tun+ -o $wifi_adaptor_name -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    # iptables -A FORWARD -i $wifi_adaptor_name -o tun+ -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    # This is where I left -> https://arashmilani.com/post?id=53
 }
 
 # Executing the main function.
