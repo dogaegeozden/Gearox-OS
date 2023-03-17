@@ -12,6 +12,8 @@ rkhunter
 chkrootkit
 clamav
 clamav-daemon
+clamtk
+mlocate
 grub-customizer
 gnome-tweaks
 python3-pip
@@ -33,3 +35,4 @@ virtualbox
 virtualbox-ext-pack
 tree
 libgtk-4-dev
+at
