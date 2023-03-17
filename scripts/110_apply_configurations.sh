@@ -22,14 +22,18 @@ declare_variables() {
 	list_of_user_alias_strings=("# Electro Linux" "alias changeip='systemctl restart tor.service'" "alias torstop='systemctl stop tor.service'" "alias torstart='systemctl start tor.service'" "alias torstatus='systemctl status tor.service'")
 	# Creating a list called list_of_root_alias_strings
 	list_of_root_alias_strings=("# Electro Linux" "alias changeip='systemctl restart tor.service'" "alias myip='proxychains curl ifconfig.io'" "alias torstop='systemctl stop tor.service'" "alias torstart='systemctl start tor.service'" "alias torstatus='systemctl status tor.service'")
+	# Creating a path which leads to ssh service's main configuration file
+	sshd_config_file_path="/etc/ssh/sshd_config"
+	# Creating a string which includes the fail2ban ssh local file's content
+	ssh_local_file_content="[sshd]\nenabled = true\nport = ssh\nfilter = sshd\nlogpath = /var/log/auth.log\nmaxretry = 3\nbantime = 120\nignoreip = whitelist-IP" 
+	# Creating a path which leads to the location where fail2ban ssh local file will be created.
+	fail2ban_ssh_local_file_path="/etc/fail2ban/jail.d/sshd.conf"
+	# Creating a path which leads to my swap file
+	myswap_file_path="/var/opt/myswap"
 	# Creating a variable called amount_of_free_swap_space_data
 	amount_of_free_swap_space_data=`free -m | grep Swap:`
 	# Creating a path which leads to the fstab file. Hint: fstab file is the file where you define the file systems that will be mount automatically.
 	fstab_file_path="/etc/fstab"
-	# Creating a path which leads to the location where fail2ban ssh local file will be created.
-	fail2ban_ssh_local_file_path="/etc/fail2ban/jail.d/sshd.conf"
-	# Creating a string which includes the fail2ban ssh local file's content
-	ssh_local_file_content="[sshd]\nenabled = true\nport = ssh\nfilter = sshd\nlogpath = /var/log/auth.log\nmaxretry = 3\nbantime = 120\nignoreip = whitelist-IP" 
 }
 
 main() {
@@ -49,6 +53,8 @@ main() {
 	configure_ssh
 	# Calling the set_up_the_fail2ban function.
 	set_up_the_fail2ban
+	# Calling the set_up_the_clamav function.
+	set_up_the_clamav
 	# Calling the set_up_the_vnstat function.
 	set_up_the_vnstat
 	# Calling the enable_swap_file function.
@@ -66,8 +72,11 @@ change_the_default_terminal_emulator() {
 configure_the_proxychains() {
 	#  A function which configures the proxychains software.
 
-	# Replace the search variable with replace variable in the idenfied file
-	sed -i "s/$search0/$replace0/" $proxychain_conf_file
+	# Checking if the replace0 variable is not already in the proxychains configuration file.
+	if [[ ! `grep $replace0 $proxychain_conf_file` ]]; then
+		# Replace the search variable with replace variable in the idenfied file
+		sed -i "s/$search0/$replace0/" $proxychain_conf_file
+	fi
 	# Replace the search variable with replace variable in the idenfied file
 	sed -i "s/$search1/$replace1/" $proxychain_conf_file
 	# Replace the search variable with replace variable in the idenfied file
@@ -109,13 +118,14 @@ create_the_root_aliases() {
 
 configure_ssh() {
 	# A function which configures the ssh 
-
-	if [[ `grep "PermitRootLogin yes" "/etc/ssh/sshd_config"` ]]; then 
-		sed -i "s/PermitRootLogin yes/PermitRootLogin no/" "/etc/ssh/sshd_config"
+	
+	# Setting PermitRootLogin to no if it's yes
+	if [[ `grep "PermitRootLogin yes" "$sshd_config_file_path"` ]]; then 
+		sed -i "s/PermitRootLogin yes/PermitRootLogin no/" "$sshd_config_file_path"
 	fi
-
-	if [[ `grep "PasswordAuthentication yes" "/etc/ssh/sshd_config"` ]]; then 
-		sed -i "s/PasswordAuthentication yes/PasswordAuthentication no/" "/etc/ssh/sshd_config"
+	# Setting PasswordAuthentication to no if it's yes
+	if [[ `grep "PasswordAuthentication yes" "$sshd_config_file_path"` ]]; then 
+		sed -i "s/PasswordAuthentication yes/PasswordAuthentication no/" "$sshd_config_file_path"
 	fi
 }
 
@@ -162,20 +172,45 @@ set_up_the_vnstat() {
 	vnstat
 }
 
+set_up_the_clamav() {
+	# A function which sets up the clamav. Hint: clamav is an open source text based anti-virus software.
+	# Hint: You can scan your file system for viruses using clamav -irv /path/to/folder
+
+	# Updating a database for plocate
+	updatedb
+
+	# Checking if the clamav-freshclam service is running. Hint: Freshclam is a service which updates the virus database.
+	if [[ `systemctl status clamav-freshclam` != *"inactive (dead)"* ]]; then
+		# Stopping the clamav-freshclam service
+		service clamav-freshclam stop	
+	fi
+	
+	# Updating the virus databases
+	freshclam
+
+	# Checking if the clamav-freshclam service is dead
+	if [[ `systemctl status clamav-freshclam` == *"inactive (dead)"* ]]; then
+		# Stopping the clamav-freshclam service
+		service clamav-freshclam start	
+	fi
+
+}
+
 enable_swap_file () {
 	# A function which enables the swap area. Hint: Swap area is a type of file system which holds data when RAM is used up. It's preventing app crashes
 
 	# Checking if myswap file is not exists
-	if [[ ! -f "/var/opt/myswap" ]]; then
+	if [[ ! -f "$myswap_file_path" ]]; then
 		# Creating a swap file
-		dd if="/dev/zero" of="/var/opt/myswap" bs=1M count=16384
+		dd if="/dev/zero" of="$myswap_file_path" bs=1M count=16384
 		# Setting up the linux swap area
-		mkswap "/var/opt/myswap"
+		mkswap "$myswap_file_path"
 		# Enabling the swap 
-		swapon "/var/opt/myswap"
-		if [[ ! `grep "/var/opt/myswap swap swap defaults 0 0" $fstab_file_path` ]]; then
+		swapon "$myswap_file_path"
+		# Checking if the fstab file doesn't include the swap file specification string
+		if [[ ! `grep "$myswap_file_path swap swap defaults 0 0" $fstab_file_path` ]]; then
 			# Make the swap area permanent
-			echo "/var/opt/myswap swap swap defaults 0 0" >> $fstab_file_path
+			echo "$myswap_file_path swap swap defaults 0 0" >> $fstab_file_path
 		fi
 
 	# Checking if myswap file is exists
@@ -187,17 +222,17 @@ enable_swap_file () {
 		# Checking if total swap size is smaller than  10000 mega bytes 
 		if [[ $swap_size < 10000 ]]; then 
 			# Deleting the swap file
-			rm "/var/opt/myswap"
+			rm "$myswap_file_path"
 			# Creating a new swap file
-			dd if="/dev/zero" of="/var/opt/myswap" bs=1M count=16384
+			dd if="/dev/zero" of="$myswap_file_path" bs=1M count=16384
 			# Setting up the linux swap area
-			mkswap "/var/opt/myswap"
+			mkswap "$myswap_file_path"
 			# Enabling the swap 
-			swapon "/var/opt/myswap"
+			swapon "$myswap_file_path"
 			# Checking if file file specification is not already specified in the "/etc/fstab file"
-			if [[ ! `grep "/var/opt/myswap swap swap defaults 0 0" $fstab_file_path` ]]; then
+			if [[ ! `grep "$myswap_file_path swap swap defaults 0 0" $fstab_file_path` ]]; then
 				# Make the swap area permanent
-				echo "/var/opt/myswap swap swap defaults 0 0" >> $fstab_file_path
+				echo "$myswap_file_path swap swap defaults 0 0" >> $fstab_file_path
 			fi
 		fi
 	fi
