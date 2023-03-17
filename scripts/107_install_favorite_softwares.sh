@@ -154,7 +154,8 @@ install_softwares_with_dpkg() {
 
 install_softwares_with_flatpak() {
     # A function which installes softwares from flathub using the flatpak package manager.
-
+    # Hint: You can search flatpak packages using the following command: flatpak search --columns=name,description,application appname
+    
     # Changing the current working directory
     cd $the_script_path
     
