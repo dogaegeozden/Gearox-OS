@@ -21,6 +21,9 @@ declare_variables() {
 main() {
     # The function which runs the entire program.
 
+    # Printing the script's name 
+	echo -e "SCRIPT: 107_install_favorite_softwares"
+
     # Calling the declare_variables function.
     declare_variables
     # Calling the install_nala_package_manager function.
@@ -39,6 +42,9 @@ main() {
     clone_security_lists
     # Calling the install_cheat_sheets function.
     install_cheat_sheets
+
+    # Printing empty lines
+	echo -e "\n\n"
 }
 
 install_nala_package_manager() {

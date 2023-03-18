@@ -18,27 +18,18 @@ declare_variables() {
 main() {
 	# The function which runs the entire script.
 
+	# Printing the script's name 
+	echo -e "SCRIPT: 109_add_services"
+
 	# Calling the declare_variables function.
 	declare_variables
-	# Calling the load_my_command_line_tools function.
-	load_my_command_line_tools
 	# Calling load_my_services function.
 	load_my_services
 	# Calling the load_my_startapp_applications function.
 	load_my_startapp_applications
-}
 
-load_my_command_line_tools() {
-	# A function which loads my command line tools to the system. So, I can use my tools like any other command.
-
-	# Looping through each command line tool in the command_line_tools folder.
-	for command_line_tool in `ls $command_line_tools_folder_path`; do
-		# Changing the file permissions of each tool.
-		chmod 741 $command_line_tools_folder_path$command_line_tool
-		chown $username:$username $command_line_tools_folder_path$command_line_tool
-		# Copying each tool to /usr/bin folder. Hint: This is the folder which contains the command linux commands.
-		cp $command_line_tools_folder_path$command_line_tool "/usr/bin/"
-	done
+	# Printing empty lines
+	echo -e "\n\n"
 }
 
 

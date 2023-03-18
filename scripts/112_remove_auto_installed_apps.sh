@@ -14,10 +14,16 @@ declaring_variables() {
 main() {
     # The function which runs the entire script.
 
+    # Printing the script's name 
+	echo -e "SCRIPT: 112_remove_auto_installed_apps"
+
     # Calling the declaring_variables function.
     declaring_variables
     # Calling the remove_auto_installed_unwanted_sofwares function.
     remove_auto_installed_unwanted_sofwares
+
+    # Printing empty lines
+	echo -e "\n\n"
 }
 
 remove_auto_installed_unwanted_sofwares() {

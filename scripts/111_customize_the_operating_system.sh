@@ -37,6 +37,9 @@ declaring_variables() {
 main() {
 	# The function which runs the entire script.
 
+	# Printing the script's name 
+	echo -e "SCRIPT: 111_customize_the_operating_system"
+
 	# Calling the declaring_variables function.
 	declaring_variables
 	# Calling the customize_user_shell function.
@@ -47,6 +50,9 @@ main() {
 	load_the_themes
 	# Calling the load_the_images function.
 	load_the_images
+
+	# Printing empty lines
+	echo -e "\n\n"
 }
 
 customize_user_shell() {

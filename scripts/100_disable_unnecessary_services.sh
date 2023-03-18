@@ -10,10 +10,16 @@ declare_variables() {
 main () {
     # The function which runs the entire script.
 
+    # Printing the script's name 
+	echo -e "SCRIPT: 100_disable_unnecessary_services"
+
     # Calling the declare_variables function.
     declare_variables
     # Calling the stop_and_disable_unnecessary_services.
     stop_and_disable_unnecessary_services
+
+    # Printing empty lines
+	echo -e "\n\n"
 }
 
 stop_and_disable_unnecessary_services () {

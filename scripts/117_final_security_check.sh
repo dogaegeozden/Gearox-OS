@@ -3,8 +3,14 @@
 main() {
     # The function which runs the entire script.
 
+    # Printing the script's name 
+	echo -e "SCRIPT: 117_final_security_check"
+
     # Calling the scan_ports function
     scan_ports
+
+    # Printing empty lines
+	echo -e "\n\n"
 }
 
 scan_ports() {

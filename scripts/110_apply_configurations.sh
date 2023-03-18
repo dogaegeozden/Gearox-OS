@@ -39,6 +39,9 @@ declare_variables() {
 main() {
 	# The function which runs the entire script.
 
+	# Printing the script's name 
+	echo -e "SCRIPT: 110_apply_configuration"
+
 	# Calling the declare_variables function.
 	declare_variables
 	# Calling the change_the_default_terminal_emulator function.
@@ -59,6 +62,9 @@ main() {
 	set_up_the_vnstat
 	# Calling the enable_swap_file function.
 	enable_swap_file
+
+	# Printing empty lines
+	echo -e "\n\n"
 }
 
 

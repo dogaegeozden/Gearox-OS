@@ -15,6 +15,9 @@ declare_variables() {
 main () {
     # The function which runs the entire script
 
+    # Printing the script's name 
+	echo -e "STARTING THE ELECTRO LINUX SET UP SCRIPTS\n"
+
     # Calling the declare_variables function
     declare_variables
     # Calling the fix_lines function

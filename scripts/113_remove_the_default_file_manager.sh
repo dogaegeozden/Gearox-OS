@@ -3,8 +3,14 @@
 main(){
     # The function which runs the entire script.
 
+    # Printing the script's name 
+	echo -e "SCRIPT: 113_remove_the_default_file_manager"
+
     # Calling the purge_the_default_file_manager function.
     purge_the_default_file_manager
+
+    # Printing empty lines
+	echo -e "\n\n"
 }
 
 purge_the_default_file_manager() {

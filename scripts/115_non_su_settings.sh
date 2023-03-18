@@ -10,11 +10,13 @@ declaring_variables() {
     background_image_path="/home/$username/Pictures/wallpapers/electro_linux_original_wp_2.png"
     # Creating a path which leads to the lock screen image which will be set.
     lock_screen_image_path="/home/$userName/Pictures/lock_screen_images/electro_lock_screen_img.png"
-
 }
 
 main() {
     # The function which runs the entire script.
+
+    # Printing the script's name 
+	echo -e "SCRIPT: 115_non_su_settings"
 
     if [[ `echo $XDG_CURRENT_DESKTOP` == *"GNOME"*]]; then
         # Calling the declaring_variables function.
@@ -34,6 +36,9 @@ main() {
         # Update the desktop environment configurations
         sudo dconf update
     fi
+
+    # Printing empty lines
+	echo -e "\n\n"
 }
 
 add_minimize_and_maximize_buttons() {

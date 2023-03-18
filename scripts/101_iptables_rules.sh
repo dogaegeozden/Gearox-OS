@@ -10,6 +10,9 @@ declare_variables() {
 main() {
     # The function which runs the entire script.
 
+    # Printing the script's name 
+	echo -e "SCRIPT: 101_iptables_rules"
+
     # Calling the declare_variables function.
     declare_variables
     # Calling the clean_up_existing_rules function.
@@ -20,6 +23,9 @@ main() {
     allow_input_and_output_on_loopback_interface
     # Calling the append_iptables_rules
     append_iptables_rules
+
+    # Printing empty lines
+	echo -e "\n\n"
 }
 
 clean_up_existing_rules() {

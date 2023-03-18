@@ -10,10 +10,16 @@ declare_variables() {
 main() {
 	# The function which runs the entire script.
 
+	# Printing the script's name 
+	echo -e "SCRIPT: 106_permanent_network_security"
+
 	# Calling the declare_variables function.
 	declare_variables
 	# Calling the install_required_softwares function.
 	install_required_softwares
+
+	# Printing empty lines
+	echo -e "\n\n"
 }
 
 install_required_softwares() {

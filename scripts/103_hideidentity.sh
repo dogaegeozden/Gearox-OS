@@ -15,10 +15,14 @@ declare_variables() {
 	new_network_configuration_file="../network_manager_conf_file.txt"
 	# Assign the original NetworkManager configuration file to a variable
 	original_network_configuration_file="/etc/NetworkManager/NetworkManager.conf"
+
 }
 
 main() {
     # The function which runs the entire script.
+
+	# Printing the script's name 
+	echo -e "SCRIPT: 103_hideidentity"
 
     # Calling the declare_variables function.
     declare_variables
@@ -34,6 +38,9 @@ main() {
 	systemctl restart NetworkManager.service
 	# Telling to computer to wait for 4 seconds.
 	sleep 4
+
+	# Printing empty lines
+	echo -e "\n\n"
 }
 
 

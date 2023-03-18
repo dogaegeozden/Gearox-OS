@@ -3,7 +3,14 @@
 main() {
     # The function which runs the entire script.
 
+    # Printing the script's name 
+	echo -e "SCRIPT: 114_reinstall_gnome_control_center"
+
+    # Calling the reinstall_gnome_control_center function
     reinstall_gnome_control_center
+
+    # Printing empty lines
+	echo -e "\n\n"
 }
 
 reinstall_gnome_control_center() {
