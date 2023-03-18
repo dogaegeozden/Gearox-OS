@@ -7,12 +7,14 @@ declare_variables() {
     username=${SUDO_USER:-${USER}}
     # Creating a variable called_wifi_connection_info_file.
     wifi_connection_info_file=`cat ../wifi_info.txt`    
-    # Creating an array called strarr by spliting the wifi_info.txt file's contents with a delimeter
-    IFS='=' read -a strarr <<< $wifi_connection_info_file
-    # Creating a variable called SSID using the array's first value
-    SSID=${strarr[0]}
-    # Creating a variable called PASSWD using the array's second value
-    PASSWD=${strarr[1]}
+    # Asking the wifi's SSID
+    echo "Enter your wifi SSID: "
+    # Reading the wifi password from the user's input
+    read SSID
+    # Asking the wifi's password
+    echo "Enter your wifi password: "
+    # Reading the wifi password from the user's input
+    read PASSWD
 }
 
 main() {
