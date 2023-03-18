@@ -13,8 +13,6 @@ declare_variables() {
 main() {
 	# The function which runs the entire script.
 
-	# Calling the inform_the_user function
-	inform_the_user
 	# Calling the declare_variables function
 	declare_variables
 	# Calling the unWantedSR function
@@ -23,16 +21,6 @@ main() {
 	sudo apt-get clean
 	# Clearing the local repository of retrieved files which are can no longer downloaded and largely useless. It's good to run time to time to free up disk space.
 	sudo apt-get autoclean
-
-	# Printing empty lines
-	echo -e "\n\n"
-}
-
-inform_the_user() {
-	# A function which informs the user about what is going on 
-
-	# Informing the user about which script is currently running
-	echo  "RUNNING SCRIPT: $0" 
 }
 
 remove_unwanted_softwares() {

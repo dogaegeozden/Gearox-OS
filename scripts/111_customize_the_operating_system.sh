@@ -37,8 +37,6 @@ declaring_variables() {
 main() {
 	# The function which runs the entire script.
 
-	# Calling the inform_the_user function
-    inform_the_user
 	# Calling the declaring_variables function.
 	declaring_variables
 	# Calling the customize_user_shell function.
@@ -49,16 +47,6 @@ main() {
 	load_the_themes
 	# Calling the load_the_images function.
 	load_the_images
-
-	# Printing empty lines
-	echo -e "\n\n"
-}
-
-inform_the_user() {
-	# A function which informs the user about what is going on 
-
-	# Informing the user about which script is currently running
-	echo  "RUNNING SCRIPT: $0" 
 }
 
 customize_user_shell() {

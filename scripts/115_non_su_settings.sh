@@ -15,8 +15,6 @@ declaring_variables() {
 main() {
     # The function which runs the entire script.
 
-    # Calling the inform_the_user function
-    inform_the_user
     if [[ `echo $XDG_CURRENT_DESKTOP` == *"GNOME"*]]; then
         # Calling the declaring_variables function.
         declaring_variables
@@ -36,16 +34,6 @@ main() {
         sudo dconf update
     else
         echo "Desktop environment is not gnome so skipping..."
-
-    # Printing empty lines
-	echo -e "\n\n"
-}
-
-inform_the_user() {
-	# A function which informs the user about what is going on 
-
-	# Informing the user about which script is currently running
-	echo  "RUNNING SCRIPT: $0" 
 }
 
 add_minimize_and_maximize_buttons() {

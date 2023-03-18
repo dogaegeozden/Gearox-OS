@@ -39,8 +39,6 @@ declare_variables() {
 main() {
 	# The function which runs the entire script.
 
-    # Calling the inform_the_user function
-    inform_the_user
 	# Calling the declare_variables function.
 	declare_variables
 	# Calling the change_the_default_terminal_emulator function.
@@ -61,16 +59,6 @@ main() {
 	set_up_the_vnstat
 	# Calling the enable_swap_file function.
 	enable_swap_file
-
-	# Printing empty lines
-	echo -e "\n\n"
-}
-
-inform_the_user() {
-	# A function which informs the user about what is going on 
-
-	# Informing the user about which script is currently running
-	echo  "RUNNING SCRIPT: $0" 
 }
 
 change_the_default_terminal_emulator() {

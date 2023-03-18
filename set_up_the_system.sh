@@ -15,10 +15,10 @@ declare_variables() {
 main () {
     # The function which runs the entire script
 
-    # Calling the declare_variables function
-    declare_variables
     # Calling the print_ascii_art function
     print_ascii_art
+    # Calling the declare_variables function
+    declare_variables
     # Calling the fix_lines function
     fix_lines
     # Calling the execute_the_scripts function
@@ -68,6 +68,8 @@ execute_the_scripts() {
 
     # Iterating through each file in the scripts folder.
     for script in `/usr/bin/ls $scripts_folder`; do
+        # Informing the user about which script is currently running
+        echo  "RUNNING SCRIPT: $script" 
         # Checking if the file name is not "115_non_su_settings.sh" or "108_installing_yed.sh"
         if [[ $script != "115_non_su_settings.sh" ]] || [[ $script != "108_installing_yed.sh" ]]; then
             # Executing the file as the super user.
@@ -77,6 +79,8 @@ execute_the_scripts() {
             # Executing the file as the reqular user.
             ./$script
         fi
+        # Printing empty lines
+        echo -e "\n\n"
     done
 
 }
