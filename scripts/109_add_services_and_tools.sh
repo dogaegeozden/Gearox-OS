@@ -18,9 +18,8 @@ declare_variables() {
 main() {
 	# The function which runs the entire script.
 
-	# Printing the script's name 
-	echo -e "SCRIPT: 109_add_services"
-
+    # Calling the inform_the_user function
+    inform_the_user
 	# Calling the declare_variables function.
 	declare_variables
 	# Calling load_my_services function.
@@ -32,6 +31,12 @@ main() {
 	echo -e "\n\n"
 }
 
+inform_the_user() {
+	# A function which informs the user about what is going on 
+
+	# Informing the user about which script is currently running
+	echo  "RUNNING SCRIPT: $0" 
+}
 
 load_my_services() {
 	# A function which sets up my services to the system.

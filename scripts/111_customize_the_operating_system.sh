@@ -37,9 +37,8 @@ declaring_variables() {
 main() {
 	# The function which runs the entire script.
 
-	# Printing the script's name 
-	echo -e "SCRIPT: 111_customize_the_operating_system"
-
+	# Calling the inform_the_user function
+    inform_the_user
 	# Calling the declaring_variables function.
 	declaring_variables
 	# Calling the customize_user_shell function.
@@ -53,6 +52,13 @@ main() {
 
 	# Printing empty lines
 	echo -e "\n\n"
+}
+
+inform_the_user() {
+	# A function which informs the user about what is going on 
+
+	# Informing the user about which script is currently running
+	echo  "RUNNING SCRIPT: $0" 
 }
 
 customize_user_shell() {

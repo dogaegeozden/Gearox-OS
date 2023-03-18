@@ -14,9 +14,8 @@ declaring_variables() {
 main() {
     # The function which runs the entire script.
 
-    # Printing the script's name 
-	echo -e "SCRIPT: 112_remove_auto_installed_apps"
-
+	# Calling the inform_the_user function
+    inform_the_user
     # Calling the declaring_variables function.
     declaring_variables
     # Calling the remove_auto_installed_unwanted_sofwares function.
@@ -24,6 +23,13 @@ main() {
 
     # Printing empty lines
 	echo -e "\n\n"
+}
+
+inform_the_user() {
+	# A function which informs the user about what is going on 
+
+	# Informing the user about which script is currently running
+	echo  "RUNNING SCRIPT: $0" 
 }
 
 remove_auto_installed_unwanted_sofwares() {

@@ -21,9 +21,8 @@ declare_variables() {
 main() {
     # The function which runs the entire script.
 
-	# Printing the script's name 
-	echo -e "SCRIPT: 103_hideidentity"
-
+	# Calling the inform_the_user function
+	inform_the_user
     # Calling the declare_variables function.
     declare_variables
 	# Calling the turn_down_the_wifi_adaptor function.
@@ -43,6 +42,12 @@ main() {
 	echo -e "\n\n"
 }
 
+inform_the_user() {
+	# A function which informs the user about what is going on 
+
+	# Informing the user about which script is currently running
+	echo  "RUNNING SCRIPT: $0" 
+}
 
 turn_down_the_wifi_adaptor() {
 	# A function which turns down the wifi adaptor.
@@ -79,7 +84,7 @@ change_the_mac_address() {
 	# Creating the mac_address variable.
 	mac_address=$oui_part1:$oui_part2:$oui_part3:$nic_part1:$nic_part2:$nic_part3
 	# Printing the mac_address.
-	echo $mac_address
+	echo "New mac address = $mac_address"
 
 	# Setting the new random mac address to the wireless adaptor
 	sudo ip link set dev $wifi_adaptor_name address $mac_address

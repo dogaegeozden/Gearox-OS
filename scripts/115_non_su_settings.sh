@@ -15,9 +15,8 @@ declaring_variables() {
 main() {
     # The function which runs the entire script.
 
-    # Printing the script's name 
-	echo -e "SCRIPT: 115_non_su_settings"
-
+    # Calling the inform_the_user function
+    inform_the_user
     if [[ `echo $XDG_CURRENT_DESKTOP` == *"GNOME"*]]; then
         # Calling the declaring_variables function.
         declaring_variables
@@ -35,10 +34,18 @@ main() {
         xdg-mime default thunar.desktop inode/directory application/x-gnome-saved-search
         # Update the desktop environment configurations
         sudo dconf update
-    fi
+    else
+        echo "Desktop environment is not gnome so skipping..."
 
     # Printing empty lines
 	echo -e "\n\n"
+}
+
+inform_the_user() {
+	# A function which informs the user about what is going on 
+
+	# Informing the user about which script is currently running
+	echo  "RUNNING SCRIPT: $0" 
 }
 
 add_minimize_and_maximize_buttons() {

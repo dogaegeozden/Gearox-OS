@@ -15,15 +15,29 @@ declare_variables() {
 main () {
     # The function which runs the entire script
 
-    # Printing the script's name 
-	echo -e "STARTING THE ELECTRO LINUX SET UP SCRIPTS\n"
-
     # Calling the declare_variables function
     declare_variables
+    # Calling the print_ascii_art function
+    print_ascii_art
     # Calling the fix_lines function
     fix_lines
     # Calling the execute_the_scripts function
     execute_the_scripts
+}
+
+print_ascii_art() {
+    # A function which prints ascii art 
+
+    cat << ""
+ _____  _              _                  _____        _                 
+|  ___|| |            | |                /  ___|      | |                
+| |__  | |  ___   ___ | |_  _ __   ___   \ `--.   ___ | |_  _   _  _ __  
+|  __| | | / _ \ / __|| __|| '__| / _ \   `--. \ / _ \| __|| | | || '_ \ 
+| |___ | ||  __/| (__ | |_ | |   | (_) | /\__/ /|  __/| |_ | |_| || |_) |
+\____/ |_| \___| \___| \__||_|    \___/  \____/  \___| \__| \__,_|| .__/ 
+                                                                | |    
+                                                                |_|    
+
 }
 
 fix_lines() {

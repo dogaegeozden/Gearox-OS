@@ -10,9 +10,8 @@ declare_variables() {
 main() {
     # The function which runs the entire script.
 
-    # Printing the script's name 
-	echo -e "SCRIPT: 101_iptables_rules"
-
+    # Calling the inform_the_user function
+	inform_the_user
     # Calling the declare_variables function.
     declare_variables
     # Calling the clean_up_existing_rules function.
@@ -23,9 +22,18 @@ main() {
     allow_input_and_output_on_loopback_interface
     # Calling the append_iptables_rules
     append_iptables_rules
+    # Calling the display_iptables_rules function
+    display_iptables_rules
 
     # Printing empty lines
 	echo -e "\n\n"
+}
+
+inform_the_user() {
+	# A function which informs the user about what is going on 
+
+	# Informing the user about which script is currently running
+	echo  "RUNNING SCRIPT: $0" 
 }
 
 clean_up_existing_rules() {
@@ -126,6 +134,11 @@ append_iptables_rules() {
     # MySQL: My Structured Query Language. MySQL is a relational database management system based on SQL – Structured Query Language. The application is used for a wide range of purposes, including data warehousing, e-commerce, and logging applications.
     # iptables -A INPUT -i $wifi_adaptor_name -p tcp -s 10.10.10.10/24 --dport 3306 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
     # iptables -A OUTPUT -o $wifi_adaptor_name -p tcp --sport 3306 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+}
+
+display_iptables_rules() {
+    # A function which displays the iptables rules
+    iptables -vnL
 }
 
 # Executing the main function.
