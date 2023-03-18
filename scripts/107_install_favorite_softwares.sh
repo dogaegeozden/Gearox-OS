@@ -6,10 +6,12 @@ declare_variables() {
     the_script_path=`pwd`
     # Creating a variable called user name.
     username=${SUDO_USER:-${USER}}
-    # Creating a path which leads to the apps.list file.
-    apt_app_list_file="../apps.list"
+    # Creating a path which leads to the apt_apps.list file.
+    apt_apps_list_file="../apt_apps.list"
+    # Creating a path which leads to the snap_apps.list file.
+    snap_apps_list_file="../snap_apps.list"
     # Creating a path which leads to the flatpak_apps.list file.
-    flatpak_app_list_file="../flatpak_apps.list"
+    flatpak_apps_list_file="../flatpak_apps.list"
     # Creating a list of virtual environment wrapper profile lines
     list_of_virtual_env_profile_lines=("export WORKON_HOME=$HOME/.virtualenvs" "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "export PROJECT_HOME=$HOME/Devel" "source /usr/local/bin/virtualenvwrapper.sh")
     # Creating a list for the command line tools that I created.
@@ -29,6 +31,8 @@ main() {
     install_softwares_with_dpkg
     # Calling the install_softwares_with_flatpak function.
     install_softwares_with_flatpak
+    # Calling the install_softwares_with_snap function
+    install_softwares_with_snap
     # Calling the install_virtual_env_wrapper function.
     install_virtual_env_wrapper
     # Calling the clone_security_lists function.
@@ -48,7 +52,7 @@ install_softwares_with_nala() {
     # A function which installs softwares using the nala package manager.
 
     # Looping through each line in the app.list file.
-    for line in $(cat $apt_app_list_file);do
+    for line in $(cat $apt_apps_list_file);do
         # Checking if the software which is written in the line is not installed.
         if [[ `apt-cache policy "$line"` == *"(none)"* ]]; then
             # Installing the software which is written in the line.
@@ -109,8 +113,6 @@ install_softwares_with_nala() {
         # Telling the user that ngrok is already installed and available in the system.
         echo "Ngrok is available in the system."
     fi
-
-    
 }
 
 install_softwares_with_dpkg() {
@@ -163,7 +165,7 @@ install_softwares_with_flatpak() {
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
     # Looping through each application in the flatpak_apps.list file.
-    for app in $(cat $flatpak_app_list_file);do
+    for app in $(cat $flatpak_apps_list_file);do
         # Checking if the application is not installed.
         if [[ `flatpak list` != *"$app"* ]]; then
             # Installing the application.
@@ -174,6 +176,25 @@ install_softwares_with_flatpak() {
         else
             # Telling to user that the software is already installed.
             echo "$app is already installed";
+        fi
+    done
+}
+
+install_softwares_with_snap() {
+    # A function which installs softwares with snap package manager
+
+    # Iterating over each line in the snap_apps_list_file
+    for line in $(cat $snap_apps_list_file);do
+        # Checking if the software which is written in the line is not installed.
+        if [[ `snap list ` != *"$line"* ]]; then
+            # Installing the software which is written in the line.
+            snap install $line;
+            # Continuing looping after installation.
+            continue
+        # Checking if the software which is written in the line is installed.
+        else
+            # Telling to user that the software is already installed.
+            echo "$line is already installed";
         fi
     done
 }
