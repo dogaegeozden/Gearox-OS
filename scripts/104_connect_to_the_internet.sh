@@ -8,11 +8,11 @@ declare_variables() {
     # Creating a variable called_wifi_connection_info_file.
     wifi_connection_info_file=`cat ../wifi_info.txt`    
     # Asking the wifi's SSID
-    echo "Enter your wifi SSID: "
+    echo "Enter the wifi's SSID: "
     # Reading the wifi password from the user's input
     read SSID
     # Asking the wifi's password
-    echo "Enter your wifi password: "
+    echo "Enter the wifi's password: "
     # Reading the wifi password from the user's input
     read PASSWD
 }
