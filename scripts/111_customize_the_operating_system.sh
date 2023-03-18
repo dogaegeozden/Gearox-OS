@@ -120,6 +120,8 @@ load_the_themes() {
 }
 
 load_the_images() {
+	# A function which copies images to appropriate locations
+	
 	# Copying the wallpapers folder into the Pictures folder
 	cp -r $wallpapers_folder_path "/home/$username/Pictures/wallpapers"
 
