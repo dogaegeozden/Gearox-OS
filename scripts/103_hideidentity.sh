@@ -57,7 +57,7 @@ change_the_mac_address() {
 	}
 
 	# Creating the first oui_part. Note: You must create the first part from the list_of_organizationally_unique_identifiers list.
-	oui_part1=${list_of_organizationally_unique_identifiers[RANDOM%1]}
+	oui_part1=${list_of_organizationally_unique_identifiers[RANDOM%${#list_of_organizationally_unique_identifiers[@]}]}
 	# Creating the second oui part
 	oui_part2=`generate_random_mac_address_part`
 	# Creating the third oui part
