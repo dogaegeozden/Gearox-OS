@@ -82,7 +82,6 @@ execute_the_scripts() {
         # Printing empty lines
         echo -e "\n\n"
     done
-
 }
 
 # Calling the main function
