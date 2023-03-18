@@ -1,1 +1,1 @@
-Humbleheart=11daylight11
+SSID=PASSWD
