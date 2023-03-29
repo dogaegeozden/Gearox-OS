@@ -29,7 +29,7 @@ remove_unwanted_softwares() {
 	# Looping through each software in the list of unnecessary apps.
 	for app in "${unnecessary_apps[@]}"; do
 		# Checking if the software is installed. Hint: If the application is installed it shouldn't include the "(none)" keyword.
- 		if [[ `$check_installation_command policy "$app"` != *"(none)"* ]]; then
+ 		if [[ `$check_installation_command policy "$app"` != *"(none)"* ]] || [[ `$check_installation_command policy "$app"` == *"Installed"* ]]; then
 			# Purging the application.
 			sudo apt purge --auto-remove "$app" -y;
             # Continuing looping after purge.
