@@ -5,10 +5,11 @@ Electro linux is a custom Ubuntu based operating system which I'm trying to deve
 
 ## INSTALLATION
 1) Install a Debian based operating system with gnome desktop environment.
-2) ```git clone https://github.com/dogaegeozden/electro_linux_setup_scripts.git```
-3) ```cd electro_linux_setup_scripts```
-4) ```chmod +x set_up_the_system.sh```
-5) ```./set_up_the_system.sh```
+2) ```cd Desktop```
+3) ```git clone https://github.com/dogaegeozden/electro_linux_setup_scripts.git```
+4) ```cd electro_linux_setup_scripts```
+5) ```chmod +x set_up_the_system.sh```
+6) ```./set_up_the_system.sh```
 
 ## BENEFITS
 1) Tilix terminal emulator is the default terminal emulator instead of gnome terminal emulator. Which is much more convenient.
