@@ -54,12 +54,16 @@ customize_user_shell() {
 
 	# Creating a backup of regular user's .bashrc file.
 	cp "/home/$username/.bashrc" "/home/$username/.bashrc.bak"
-	# Customizing the shell prompt.
-	echo 'export PS1="-[\[$(tput sgr0)\]\[\033[38;5;10m\]\d\[$(tput sgr0)\]-\[$(tput sgr0)\]\[\033[38;5;10m\]\t\[$(tput sgr0)\]]-[\[$(tput sgr0)\]\[\033[38;5;214m\]\u\[$(tput sgr0)\]@\[$(tput sgr0)\]\[\033[38;5;196m\]\h\[$(tput sgr0)\]]-\n-[\[$(tput sgr0)\]\[\033[38;5;33m\]\w\[$(tput sgr0)\]]\\$ \[$(tput sgr0)\]"' >> "/home/$username/.bashrc"
-	# Customizing user's history format.
-	echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> "/home/$username/.bashrc"
-	# Executing commands from a file in the current shell.
-	source "/home/$username/.bashrc"
+	if [[ ! `grep HISTTIMEFORMAT="%d/%m/%y %T` != "/home/$username/.bashrc" ]]; then
+		# Customizing the shell prompt.
+		echo 'export PS1="-[\[$(tput sgr0)\]\[\033[38;5;10m\]\d\[$(tput sgr0)\]-\[$(tput sgr0)\]\[\033[38;5;10m\]\t\[$(tput sgr0)\]]-[\[$(tput sgr0)\]\[\033[38;5;214m\]\u\[$(tput sgr0)\]@\[$(tput sgr0)\]\[\033[38;5;196m\]\h\[$(tput sgr0)\]]-\n-[\[$(tput sgr0)\]\[\033[38;5;33m\]\w\[$(tput sgr0)\]]\\$ \[$(tput sgr0)\]"' >> "/home/$username/.bashrc"
+		# Customizing user's history format.
+		echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> "/home/$username/.bashrc"
+		# Executing commands from a file in the current shell.
+		source "/home/$username/.bashrc"
+	else
+		echo "Terminal is already modified"
+	fi
 }
 
 customize_root_shell() {
