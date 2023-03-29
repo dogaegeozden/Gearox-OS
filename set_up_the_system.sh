@@ -70,14 +70,14 @@ execute_the_scripts() {
     for script in `/usr/bin/ls $scripts_folder`; do
         # Informing the user about which script is currently running
         echo  "RUNNING SCRIPT: $script" 
+        # Checking if the file name is "115_non_su_settings.sh" or "108_installing_yed.sh"
+        if [[ $script == "115_non_su_settings.sh" ]] || [[ $script == "108_installing_yed.sh" ]]; then
+            # Executing the file as the reqular user.
+            bash $script
         # Checking if the file name is not "115_non_su_settings.sh" or "108_installing_yed.sh"
-        if [[ $script != "115_non_su_settings.sh" ]] || [[ $script != "108_installing_yed.sh" ]]; then
+        else
             # Executing the file as the super user.
             sudo ./$script
-        # Checking if the file name is "115_non_su_settings.sh" or "108_installing_yed.sh"
-        else
-            # Executing the file as the reqular user.
-            ./$script
         fi
         # Printing empty lines
         echo -e "\n\n"
@@ -86,3 +86,4 @@ execute_the_scripts() {
 
 # Calling the main function
 main
+
