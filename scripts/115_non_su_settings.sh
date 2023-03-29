@@ -1,21 +1,10 @@
 #!/bin/bash
 
 
-declaring_variables() {
-    # A function which declares variables.
-
-    # Creating a variable called username, by getting the user's username from the system. 
-    username=${SUDO_USER:-${USER}}
-    # Creating a path which leads to the background image which will be set.
-    background_image_path="/home/$username/Pictures/wallpapers/electro_linux_original_wp_2.png"
-    # Creating a path which leads to the lock screen image which will be set.
-    lock_screen_image_path="/home/$userName/Pictures/lock_screen_images/electro_lock_screen_img.png"
-}
-
 main() {
     # The function which runs the entire script.
 
-    if [[ `echo $XDG_CURRENT_DESKTOP` == *"GNOME"*]]; then
+    if [[ `echo $XDG_CURRENT_DESKTOP` == *"GNOME"* ]]; then
         # Calling the declaring_variables function.
         declaring_variables
         # Calling the add_minimize_and_maximize_buttons function.
@@ -34,6 +23,18 @@ main() {
         sudo dconf update
     else
         echo "Desktop environment is not gnome so skipping..."
+    fi
+}
+
+declaring_variables() {
+    # A function which declares variables.
+
+    # Creating a variable called username, by getting the user's username from the system. 
+    username=${SUDO_USER:-${USER}}
+    # Creating a path which leads to the background image which will be set.
+    background_image_path="/home/$username/Pictures/wallpapers/electro_linux_original_wp_2.png"
+    # Creating a path which leads to the lock screen image which will be set.
+    lock_screen_image_path="/home/$userName/Pictures/lock_screen_images/electro_lock_screen_img.png"
 }
 
 add_minimize_and_maximize_buttons() {
