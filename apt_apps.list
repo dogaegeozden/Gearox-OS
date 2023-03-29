@@ -1,10 +1,12 @@
 flatpak
 gnome-software-plugin-flatpak
+git
 net-tools
 thunar
 tilix
 tmux
 tor
+libreoffice
 proxychains
 nmap
 fail2ban
