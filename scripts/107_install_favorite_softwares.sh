@@ -6,6 +6,8 @@ declare_variables() {
     the_script_path=`pwd`
     # Creating a variable called user name.
     username=${SUDO_USER:-${USER}}
+    # Creating a path variable which leads to the user's home directory.
+    home_dir="/home/$username"
     # Creating a path which leads to the apt_apps.list file.
     apt_apps_list_file="../apt_apps.list"
     # Creating a path which leads to the snap_apps.list file.
@@ -13,7 +15,7 @@ declare_variables() {
     # Creating a path which leads to the flatpak_apps.list file.
     flatpak_apps_list_file="../flatpak_apps.list"
     # Creating a list of virtual environment wrapper profile lines
-    list_of_virtual_env_profile_lines=("export WORKON_HOME=$HOME/.virtualenvs" "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "export PROJECT_HOME=$HOME/Devel" "source /usr/local/bin/virtualenvwrapper.sh")
+    list_of_virtual_env_profile_lines=("export WORKON_HOME=$home_dir/.virtualenvs" "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "export PROJECT_HOME=$home_dir/Devel" "source /usr/local/bin/virtualenvwrapper.sh")
     # Creating a list for the command line tools that I created.
     my_apps_list_file="../myapps.list"
 }
@@ -67,7 +69,7 @@ install_softwares_with_nala() {
     done
 
     # Checking if veracrypt is not installed.
-    if [[ `apt-cache policy "veracrypt"` == *"(none)"* ]]; then
+    if [[ `apt-cache policy "veracrypt"` != *"Installed"* ]]; then
         # Changing the current working directory.
         cd /opt
         # Checking if file is not exists.
@@ -76,15 +78,8 @@ install_softwares_with_nala() {
             curl -L https://launchpad.net/veracrypt/trunk/1.25.9/+download/veracrypt-1.25.9-Debian-11-amd64.deb -o veracrypt.deb;
             # Changing the file permissions.
             chmod 777 veracrypt.deb;
-            # Checking if veracrypt is not installed.
-            if [[ `apt policy veracrypt` == *"(none)"* ]]; then
-                # Installing the veracrypt
-                nala install ./veracrypt.deb -yy;
-            # Checking if veracrypt is already installed
-            else
-                # Letting the user know that veracrypt is already available in the system.
-                echo "Veracrypt is already available in the system."
-            fi
+            # Installing the veracrypt
+            nala install ./veracrypt.deb -yy;
         # Checking if the file is exists.
         else
             # Changing the file permissions.
@@ -99,7 +94,7 @@ install_softwares_with_nala() {
     fi
     
     # Checking if ngrok is not installed
-    if [[ `apt policy ngrok` == *"(none)"* ]]; then
+    if [[ `apt policy ngrok` != *"Installed"* ]]; then
         # Sending a get request to ngrok's asc file silently, creating a new file which contains the request out put and redicrecting both stdout and stderr in to /dev/null
         curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null 
         # Reading ngrok's sources information and creating new file with this information in appropriate location.
@@ -142,7 +137,7 @@ install_softwares_with_dpkg() {
         fi
     
         # Checking if the package is not installed
-        if [[ `apt policy "$app_name"` == *"(none)"* ]]; then
+        if [[ `apt policy "$app_name"` != *"Installed"* ]]; then
             # Starting the installers code.
             dpkg -i "$installer_name"
         # Checking if the application is already installed.
@@ -205,9 +200,9 @@ install_virtual_env_wrapper() {
     # Note: The reason why I'm not installing bunch of python package is that, it's better to create a virtual environment for each project, and install it's requirements, recursively from a requirements.txt file. Ex: pip3 install -r requirements.txt
 
     # Checking if the virtualenvwrapper is not installed.
-	if [[ `su - $username -c "pip3 freeze"` != *"virtualenvwrapper"* ]]; then
+	if [[ `su - $username -c "pip3 freeze"` == *"virtualenvwrapper"* ]]; then
         # Installing the virtualenvwrapper python package.
-		su - $username -c "pip3 install virtualenvwrapper"
+		sudo pip3 install virtualenvwrapper
         # Looping through each line in the list_of_virtual_env_profile_lines list
         for line in "${list_of_virtual_env_profile_lines[@]}"; do
             # Checking if the line is not written the user's .bashrc file.
