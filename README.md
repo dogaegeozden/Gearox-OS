@@ -1,15 +1,30 @@
-# ELECTRO LINUX
+# ELECTRO LINUX SET UP SCRIPTS
 ![ElectroLinuxLogo](https://raw.githubusercontent.com/dogaegeozden/electro_linux_setup_scripts/master/logos/electro_linux_logo_1.png)
 
-Electro linux is a custom Ubuntu based operating system which I'm trying to develop. This repository includes my set up scripts, wallpapers, command line tools, services and etc. 
+Electro linux is a custom Debian based operating system which I'm trying to develop. This repository includes my set up scripts, wallpapers, command line tools, services and etc. 
 
 ## INSTALLATION
-1) Install a Debian based operating system with gnome desktop environment.
-2) ```cd Desktop```
-3) ```git clone https://github.com/dogaegeozden/electro_linux_setup_scripts.git```
-4) ```cd electro_linux_setup_scripts```
-5) ```chmod +x set_up_the_system.sh```
-6) ```./set_up_the_system.sh```
+1) Change the current working directory to Desktop
+
+		cd Desktop
+
+2) Clone the code 
+		
+		git clone https://github.com/dogaegeozden/electro_linux_setup_scripts.git
+
+3) Change the current working directory into the set up scripts' folder 
+
+		cd electro_linux_setup_scripts
+
+4) Change the launcher file's permissions
+
+		chmod +x set_up_the_system.sh
+
+
+5) Start the launcher
+		
+		./launcher.sh
+
 
 ## BENEFITS
 1) Tilix terminal emulator is the default terminal emulator instead of gnome terminal emulator. Which is much more convenient.
