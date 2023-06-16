@@ -6,25 +6,23 @@ Electro linux is a custom Debian based operating system which I'm trying to deve
 ## INSTALLATION
 1) Change the current working directory to Desktop
 
-		cd Desktop
+       cd Desktop
 
 2) Clone the code 
 		
-		git clone https://github.com/dogaegeozden/electro_linux_setup_scripts.git
+       git clone https://github.com/dogaegeozden/electro_linux_setup_scripts.git
 
 3) Change the current working directory into the set up scripts' folder 
 
-		cd electro_linux_setup_scripts
+       cd electro_linux_setup_scripts
 
 4) Change the launcher file's permissions
 
-		chmod +x set_up_the_system.sh
-
+       chmod +x set_up_the_system.sh
 
 5) Start the launcher
 		
-		./launcher.sh
-
+       ./launcher.sh
 
 ## BENEFITS
 1) Tilix terminal emulator is the default terminal emulator instead of gnome terminal emulator. Which is much more convenient.
