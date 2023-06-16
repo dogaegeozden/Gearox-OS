@@ -18,7 +18,7 @@ Electro linux is a custom Debian based operating system which I'm trying to deve
 
 4) Change the launcher file's permissions
 
-       chmod +x set_up_the_system.sh
+       chmod +x launcher.sh
 
 5) Start the launcher
 		
