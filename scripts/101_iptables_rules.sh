@@ -108,6 +108,7 @@ append_iptables_rules() {
     iptables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
 
     iptables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 22 -j ACCEPT
+    
     # Geting output -> Packages coming into  the source port(Source Port: It is your machine's port, that's why you are only allowing when the state is established. Becase your security is what matters most for you.)
     iptables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
 
@@ -115,34 +116,56 @@ append_iptables_rules() {
 
     # NTP: Network Time Protocol -> The purpose of this protocol to syncronize the system's time.
     #iptables -A INPUT -i $wifi_adaptor_name -p udp -m conntrack --ctstate ESTABLISHED,RELATED --dport 123 -j ACCEPT
+    
     #iptables -A OUTPUT -o $wifi_adaptor_name -p udp -m udp --sport 123 -j ACCEPT
 
     # CUPS: Common UNIX Printing System -> The purpose of cups is to allow a computer to act as a priting server so it can accept printing jobs and etc.
     #iptables -A INPUT -p udp -m udp --dport 631 -j ACCEPT
+    
     #iptables -A INPUT -p tcp -m tcp --dport 631 -j ACCEPT
+    
     #iptables -A OUTPUT -p udp -m udp --sport 631 -j ACCEPT
+    
     #iptables -A OUTPUT -p tcp -m tcp --sport 631 -j ACCEPT
 
     # EMAIL: These settings are for being able to use email services.
     # STMP: The Simple Mail Transfer Protocol (SMTP) is an internet standard communication protocol for electronic mail transmission. Mail servers and other message transfer agents use SMTP to send and receive mail messages.
     #iptables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED,RELATED --sport 465 -j ACCEPT
+    
     #iptables -A OUTPUT -o $wifi_adaptor_name -p tcp -m tcp --dport 465 -j ACCEPT
 
     # IMAP: The Internet Message Access Protocol (IMAP) is an Internet standard protocol used by email clients to retrieve email messages from a mail server over a TCP/IP connection.
     #iptables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED,RELATED --sport 993 -j ACCEPT
+    
     #iptables -A OUTPUT -o $wifi_adaptor_name -p tcp -m tcp --dport 993 -j ACCEPT
 
     # POP3: The Post Office Protocol (POP3) is an Internet standard protocol used by local email software clients to retrieve emails from a remote mail server over a TCP/IP connection, these email clients may require the configuration of Post Office Protocol (or POP3) before messages can be downloaded from the server.
     #iptables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED,RELATED --sport 995 -j ACCEPT
+    
     #iptables -A OUTPUT -o $wifi_adaptor_name -p tcp -m tcp --dport 995 -j ACCEPT
 
     # DHCP: The Dynamic Host Configuration Protocol (DHCP) is a network management protocol used on Internet Protocol (IP) networks for automatically assigning IP addresses and other communication parameters to devices connected to the network using a client–server architecture. If you are using a static ip address you don't need it.
     #iptables -A INPUT -i $wifi_adaptor_name -p udp -m conntrack --ctstate ESTABLISHED,RELATED --sport 67:68 -j ACCEPT
+    
     #iptables -A OUTPUT -o $wifi_adaptor_name -p udp -m udp --dport 67:68 -j ACCEPT
 
     # MySQL: My Structured Query Language. MySQL is a relational database management system based on SQL – Structured Query Language. The application is used for a wide range of purposes, including data warehousing, e-commerce, and logging applications.
+    # Putting input
+    iptables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 3306 -j ACCEPT
+
+    iptables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 3306 -j ACCEPT
+    
+    # Geting output
+    iptables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 3306 -j ACCEPT
+
+    iptables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 3306 -j ACCEPT
+ 
+
+    # Allowing MySQL Server from Specific IP Address or Subnet
     # iptables -A INPUT -i $wifi_adaptor_name -p tcp -s 10.10.10.10/24 --dport 3306 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+    
     # iptables -A OUTPUT -o $wifi_adaptor_name -p tcp --sport 3306 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+
 }
 
 display_iptables_rules() {
@@ -155,3 +178,4 @@ display_iptables_rules() {
 
 # Executing the main function.
 main
+

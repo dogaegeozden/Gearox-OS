@@ -11,10 +11,10 @@ main() {
 	remove_unwanted_softwares
 
 	# Clearing the local repository of retrieved files. It's good to run time to time to free up disk space.
-	sudo apt-get clean
+	apt-get clean
 
 	# Clearing the local repository of retrieved files which are can no longer downloaded and largely useless. It's good to run time to time to free up disk space.
-	sudo apt-get autoclean
+	apt-get autoclean
 }
 
 declare_variables() {
@@ -33,8 +33,14 @@ remove_unwanted_softwares() {
 		# Checking if the software is installed. Hint: If the application is installed it shouldn't include the "(none)" keyword.
  		if [[ `apt policy "$app"` != *"(none)"* ]] || [[ `apt policy "$app"` == *"Installed"* ]]; then
 
+			# Letting the user know what's happening
+			echo -e "Deleting $app\n"
+
 			# Purging the application.
-			sudo apt purge --auto-remove "$app" -y;
+			apt purge --auto-remove "$app" -y;
+
+			# Letting the user know what's happening
+			echo -e "$app has been deleted\n"
 
             # Continuing looping after purge.
 			continue

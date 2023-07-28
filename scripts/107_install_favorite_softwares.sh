@@ -5,74 +5,84 @@ main() {
 
     # Calling the declare_variables function.
     declare_variables
-    # Calling the install_nala_package_manager function.
-    install_nala_package_manager
-    # Calling the install_softwares_with_nala function.
-    install_softwares_with_nala
+
+    # Calling the install_softwares_with_apt function.
+    install_softwares_with_apt
+
     # Calling the install_softwares_with_dpkg function.
     install_softwares_with_dpkg
+
     # Calling the install_softwares_with_flatpak function.
     install_softwares_with_flatpak
+
     # Calling the install_softwares_with_snap function
     install_softwares_with_snap
+
     # Calling the install_virtual_env_wrapper function.
     install_virtual_env_wrapper
+
     # Calling the clone_security_lists function.
     clone_security_lists
+
     # Calling the install_cheat_sheets function.
     install_cheat_sheets
+
 }
 
 declare_variables() {
     # A function which declares variables.
 
     the_script_path=`pwd`
+
     # Creating a variable called user name.
     username=${SUDO_USER:-${USER}}
+
     # Creating a path variable which leads to the user's home directory.
     home_dir="/home/$username"
+
     # Creating a path which leads to the apt_apps.list file.
     apt_apps_list_file="../apt_apps.list"
+
     # Creating a path which leads to the snap_apps.list file.
     snap_apps_list_file="../snap_apps.list"
+
     # Creating a path which leads to the flatpak_apps.list file.
     flatpak_apps_list_file="../flatpak_apps.list"
+
     # Creating a list of virtual environment wrapper profile lines
     list_of_virtual_env_profile_lines=("export WORKON_HOME=$home_dir/.virtualenvs" "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3" "export PROJECT_HOME=$home_dir/Devel" "source /usr/local/bin/virtualenvwrapper.sh")
+   
     # Creating a list for the command line tools that I created.
     my_apps_list_file="../myapps.list"
+
 }
 
-
-install_nala_package_manager() {
-    # A function which installs the nala package manager.
-
-    # Telling to the user what's happening
-    echo "Installing the nala package manager"
-
-    # Installing nala package manager
-    apt install nala -y;
-}
-
-install_softwares_with_nala() {
-    # A function which installs softwares using the nala package manager.
+install_softwares_with_apt() {
+    # A function which installs softwares using the apt package manager.
 
     # Telling to the user what's happening
-    echo "Installing the softwares from apt_apps.list file with nala package manager"
+    echo "Installing the softwares from apt_apps.list file with apt package manager"
 
     # Looping through each line in the app.list file.
     for line in $(cat $apt_apps_list_file);do
+
         # Checking if the software which is written in the line is not installed.
         if [[ `apt-cache policy "$line"` == *"(none)"* ]]; then
+
             # Installing the software which is written in the line.
-            nala install $line -yy;
+            apt install $line -yy;
+
             # Continuing looping after installation.
             continue
+
         # Checking if the software which is written in the line is installed.
         else
+
             # Telling to user that the software is already installed.
             echo "$line is already installed";
+
         fi
+        
     done
 
     # Checking if veracrypt is not installed.
@@ -83,6 +93,7 @@ install_softwares_with_nala() {
 
         # Checking if file is not exists.
         if [[ ! -f /opt/veracrypt.deb ]]; then
+
             # Send a get request to download the file.
             curl -L https://launchpad.net/veracrypt/trunk/1.25.9/+download/veracrypt-1.25.9-Debian-10-amd64.deb -o veracrypt.deb;
             
@@ -90,7 +101,7 @@ install_softwares_with_nala() {
             chmod 777 veracrypt.deb;
             
             # Installing the veracrypt
-            nala install ./veracrypt.deb -yy;
+            apt install ./veracrypt.deb -yy;
         
         # Checking if the file is exists.
         else
@@ -99,7 +110,7 @@ install_softwares_with_nala() {
             chmod 777 veracrypt.deb;
         
             # Installing the veracrypt
-            nala install ./veracrypt.deb -yy;
+            apt install ./veracrypt.deb -yy;
         
         fi
 
@@ -115,16 +126,16 @@ install_softwares_with_nala() {
     if [[ `apt policy ngrok` != *"Installed"* ]]; then
         
         # Sending a get request to ngrok's asc file silently, creating a new file which contains the request out put and redicrecting both stdout and stderr in to /dev/null
-        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null 
+        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null 
         
         # Reading ngrok's sources information and creating new file with this information in appropriate location.
-        echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list 
+        echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list 
         
         # Updating the packages' information
-        sudo apt update 
+        apt update 
         
         # Installing the software
-        sudo apt install ngrok
+        apt install ngrok
     
     # Checking if ngrok is installed
     else
@@ -273,7 +284,7 @@ install_virtual_env_wrapper() {
 	if [[ `su - $username -c "pip3 freeze"` == *"virtualenvwrapper"* ]]; then
 
         # Installing the virtualenvwrapper python package.
-		sudo pip3 install virtualenvwrapper
+		pip3 install virtualenvwrapper
 
         # Looping through each line in the list_of_virtual_env_profile_lines list
         for line in "${list_of_virtual_env_profile_lines[@]}"; do

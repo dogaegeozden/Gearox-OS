@@ -7,16 +7,19 @@ declare_variables() {
     username=${SUDO_USER:-${USER}}
 
     # Asking the wifi's SSID
-    echo "Enter the wifi's SSID: "
+    echo -n "Enter the wifi's SSID: "
 
     # Reading the wifi password from the user's input
-    read SSID
+    read ssid
 
     # Asking the wifi's password
-    echo "Enter the wifi's password: "
+    echo -n "Enter the wifi's password: "
 
     # Reading the wifi password from the user's input
-    read PASSWD
+    read -s internet_password
+
+    # Printing an empty line
+    echo -e "\n"
 
 }
 
@@ -35,13 +38,13 @@ connect_to_wifi() {
     # A function which connects to the wifi.
 
     # Printing what application is trying to do.
-    echo "Connecting to $SSID"
+    echo "Connecting to $ssid"
 
     # Connecting to the wifi using network manager command line interface
-    nmcli dev wifi connect "$SSID" password "$PASSWD" private yes
+    nmcli dev wifi connect "$ssid" password "$internet_password" private yes
 
     # Setting autoconnect no
-    nmcli connection modify "$SSID" connection.autoconnect no
+    nmcli connection modify "$ssid" connection.autoconnect no
 
     # Waiting for 5 seconds.
     sleep 5

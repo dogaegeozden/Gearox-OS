@@ -12,12 +12,16 @@ reinstall_gnome_control_center() {
 
     # Checking if the gnome-control-center is not installed.
     if [[ `apt-cache policy "gnome-control-center"` == *"(none)"* ]]; then
+
         # Reinstalling the gnome-control-center
-        sudo nala install --reinstall "gnome-control-center" -yy
+        apt install --reinstall "gnome-control-center" -yy
+
     # Checking if the gnome-control-center is installed.
     else
+
         # Telling to user that the gnome-control-center is already available in the system.
         echo "gnome-control-center is already installed."
+        
     fi
 }
 

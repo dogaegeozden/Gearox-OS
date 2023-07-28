@@ -53,7 +53,7 @@ turn_down_the_wifi_adaptor() {
 	# A function which turns down the wifi adaptor.
 
 	# Turning down the wifi adaptor.
-	sudo ip link set dev $wifi_adaptor_name down
+	ip link set dev $wifi_adaptor_name down
 
 }
 
@@ -96,7 +96,7 @@ change_the_mac_address() {
 	echo "New mac address = $mac_address"
 
 	# Setting the new random mac address to the wireless adaptor
-	sudo ip link set dev $wifi_adaptor_name address $mac_address
+	ip link set dev $wifi_adaptor_name address $mac_address
 
 }
 
@@ -116,7 +116,7 @@ turn_up_the_wifi_adaptor() {
 	# A function which turns up the wifi adaptor.
 
 	# Turning up the wifi adaptor..
-	sudo ip link set dev $wifi_adaptor_name up
+	ip link set dev $wifi_adaptor_name up
 	
 }
 

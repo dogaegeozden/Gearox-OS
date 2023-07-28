@@ -14,7 +14,7 @@ declare_variables() {
 	# A function which creates variables.
 
     # Creating a list of unnecessary services.
-    unnecessary_services=("cups.service" "avahi-daemon.service" "avahi-daemon.socket" "cups-browsed.service" "sshd.service" "ssh.service" "exim4.service" "openvpn.service" "apache2" "httpd")
+    unnecessary_services=("cups.service" "avahi-daemon.service" "avahi-daemon.socket" "cups-browsed.service" "sshd.service" "ssh.service" "exim4.service" "openvpn.service" "apache2" "httpd" "bluetooth.service")
 }
 
 stop_and_disable_unnecessary_services () {
@@ -28,6 +28,7 @@ stop_and_disable_unnecessary_services () {
 
             # Stopping the service.
             systemctl stop "$service"
+            
         fi
 
         # Checking if the service is not disabled.

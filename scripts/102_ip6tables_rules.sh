@@ -101,16 +101,16 @@ append_iptables_rules() {
     ip6tables -A INPUT -i $wifi_adaptor_name -p udp --sport 53 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
     ip6tables -A OUTPUT -o $wifi_adaptor_name -p udp --dport 53 -m udp -j ACCEPT
-    
+
     # SSH: The Secure Shell Protocol (SSH) is a cryptographic network protocol for operating network services securely over an unsecured network. Its most notable applications are remote login and command-line execution.
     # Puting input -> Packages coming into the destionation port(Destination Port: It is the other machine's port, thats why you are only allowing when the state is either new or established. Because your security is what matters most for you, not the other's.)
-    ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
+    # ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
 
-    ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 22 -j ACCEPT
+    # ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 22 -j ACCEPT
     # Geting output -> Packages coming into  the source port(Source Port: It is your machine's port, that's why you are only allowing when the state is established. Becase your security is what matters most for you.)
-    ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
+    # ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 22 -j ACCEPT
 
-    ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 22 -j ACCEPT
+    # ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 22 -j ACCEPT
 
     # NTP: Network Time Protocol -> The purpose of this protocol to syncronize the system's time.
     #ip6tables -A INPUT -i $wifi_adaptor_name -p udp -m conntrack --ctstate ESTABLISHED,RELATED --dport 123 -j ACCEPT
@@ -140,9 +140,15 @@ append_iptables_rules() {
     #ip6tables -A OUTPUT -o $wifi_adaptor_name -p udp -m udp --dport 67:68 -j ACCEPT
 
     # MySQL: My Structured Query Language. MySQL is a relational database management system based on SQL – Structured Query Language. The application is used for a wide range of purposes, including data warehousing, e-commerce, and logging applications.
-    # ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -s 2001:0db8:85a3:0000:0000:8a2e:0370:7334 --dport 3306 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
-    # ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp --sport 3306 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+    # Putting input
+    ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 3306 -j ACCEPT
 
+    ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 3306 -j ACCEPT
+    
+    # Geting output
+    ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 3306 -j ACCEPT
+
+    ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 3306 -j ACCEPT
 }
 
 display_ip6tables_rules() {
