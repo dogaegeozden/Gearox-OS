@@ -1,16 +1,6 @@
 #!/usr/bin/bash
 
-# Hint: To see the location of the command that you are looking forward to use: Use; which <command name>
-
-declare_variables() {
-    # A function which creates variables
-
-    # Getting the user name
-    username=${SUDO_USER:-${USER}}
-
-    # Creating a path to the scripts folder.
-    scripts_folder=`pwd`"/scripts"
-}
+# Hint: To see the location of the command that you are looking forward to use: Use; which <command name> or whereis <command name>
 
 main () {
     # The function which runs the entire script
@@ -27,6 +17,16 @@ main () {
     # Calling the execute_the_scripts function
     execute_the_scripts
 
+}
+
+declare_variables() {
+    # A function which creates variables
+
+    # Getting the user name
+    username=${SUDO_USER:-${USER}}
+
+    # Creating a path to the scripts folder.
+    scripts_folder=`pwd`"/scripts"
 }
 
 print_ascii_art() {
