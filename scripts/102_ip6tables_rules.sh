@@ -141,14 +141,14 @@ append_iptables_rules() {
 
     # MySQL: My Structured Query Language. MySQL is a relational database management system based on SQL – Structured Query Language. The application is used for a wide range of purposes, including data warehousing, e-commerce, and logging applications.
     # Putting input
-    ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 3306 -j ACCEPT
+    # ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 3306 -j ACCEPT
 
-    ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 3306 -j ACCEPT
+    # ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 3306 -j ACCEPT
     
     # Geting output
-    ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 3306 -j ACCEPT
+    # ip6tables -A OUTPUT -o $wifi_adaptor_name -p tcp -m conntrack --ctstate NEW,ESTABLISHED --dport 3306 -j ACCEPT
 
-    ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 3306 -j ACCEPT
+    # ip6tables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 3306 -j ACCEPT
 }
 
 display_ip6tables_rules() {

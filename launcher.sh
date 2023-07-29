@@ -24,9 +24,6 @@ main () {
     # Calling the fix_lines function
     fix_lines
 
-    # Calling the get_the_password function.
-    get_the_password
-
     # Calling the execute_the_scripts function
     execute_the_scripts
 
@@ -73,17 +70,6 @@ make_executable() {
 
 }
 
-get_the_password() {
-    # A function which gets the password that is required to get root privledges
-
-    # Telling to user to enter the password which is requied to get the root privileges
-    echo -n "Enter the password required to get the root privileges: "
-
-    # Reading the user input and storing it in to a variable called user_pwd
-    read -s user_pwd
-
-    echo -e "\n\n"
-}
 
 execute_the_scripts() {
     # A function which executes the scripts

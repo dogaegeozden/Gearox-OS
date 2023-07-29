@@ -160,7 +160,6 @@ append_iptables_rules() {
 
     iptables -A INPUT -i $wifi_adaptor_name -p tcp -m conntrack --ctstate ESTABLISHED --sport 3306 -j ACCEPT
  
-
     # Allowing MySQL Server from Specific IP Address or Subnet
     # iptables -A INPUT -i $wifi_adaptor_name -p tcp -s 10.10.10.10/24 --dport 3306 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
     
